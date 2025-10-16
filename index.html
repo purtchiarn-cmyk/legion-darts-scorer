@@ -3,67 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Legion Darts Scorer v3.0</title>
+  <title>Legion Darts Scorer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <button id="darkToggle">☀️</button>
+  <div class="container">
+    <h1>Legion Darts Scorer</h1>
 
-  <div id="startScreen" class="card">
-    <h1>🎯 Legion Darts Scorer</h1>
-    <input id="homeName" value="Home" placeholder="Enter Home Player Name"><br>
-    <input id="awayName" value="Away" placeholder="Enter Away Player Name"><br>
-    <label>Best of: <input id="bestOf" type="number" min="1" max="9" value="3" style="width:50px"></label><br><br>
-    <button id="startGame">Start Game</button>
-    <p style="margin-top:1rem;font-size:0.8rem;">Version v3.0</p>
-  </div>
-
-  <div id="gameScreen">
-    <div id="scoreboard" class="card">
-      <div class="player active" id="home">
-        <h2>Home (P1)</h2>
-        <div class="score" id="score1">501</div>
-        <div class="checkout" id="checkout1"></div>
-        <div class="avg" id="avg1">3DA: 0.00</div>
-        <div class="dart-row" id="darts1">
-          <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
-        </div>
-      </div>
-      <div class="player" id="away">
-        <h2>Away (P2)</h2>
-        <div class="score" id="score2">501</div>
-        <div class="checkout" id="checkout2"></div>
-        <div class="avg" id="avg2">3DA: 0.00</div>
-        <div class="dart-row" id="darts2">
-          <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
-        </div>
-      </div>
+    <div id="score-container">
+      <div id="player1-score" class="player-score">Player 1: <span id="score1">501</span></div>
+      <div id="player2-score" class="player-score">Player 2: <span id="score2">501</span></div>
     </div>
 
-    <div id="keypad" class="card">
-      <button data-action="D">D</button>
-      <button data-action="T">T</button>
-      <button data-action="25">25</button>
-      <button data-action="BULL">Bull</button>
-      <button data-action="NS">No Score</button>
-      <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
-      <button>6</button><button>7</button><button>8</button><button>9</button><button>10</button>
-      <button>11</button><button>12</button><button>13</button><button>14</button><button>15</button>
-      <button>16</button><button>17</button><button>18</button><button>19</button><button>20</button>
+    <div id="input-section">
+      <input type="number" id="dart1" placeholder="Dart 1" min="0" max="180" />
+      <input type="number" id="dart2" placeholder="Dart 2" min="0" max="180" />
+      <input type="number" id="dart3" placeholder="Dart 3" min="0" max="180" />
+      <button id="submit-turn">Submit Turn</button>
     </div>
 
     <div id="controls">
-      <button id="statsBtn">📊</button>
-      <button id="undoDart">↩️ Dart</button>
-      <button id="undoTurn">↩️ Turn</button>
-      <button id="undoLast">↩️ Prev</button>
+      <button id="undo-dart">Undo Dart</button>
+      <button id="undo-turn">Undo Turn</button>
+      <button id="reset-game">Reset Game</button>
+      <button id="toggle-dark">Toggle Dark Mode</button>
     </div>
 
-    <button id="submitTurn" style="margin-top:0.8rem;width:90%;max-width:400px;">Submit Turn</button>
-    <div id="message"></div>
+    <div id="stats">
+      <p>Player 1 Avg: <span id="avg1">0.00</span></p>
+      <p>Player 2 Avg: <span id="avg2">0.00</span></p>
+      <p>Checkout Suggestion: <span id="checkout">—</span></p>
+    </div>
   </div>
-
-  <div id="matchHistory" class="card"></div>
 
   <script src="main.js"></script>
 </body>
