@@ -10,9 +10,24 @@
   <div class="container">
     <h1>Legion Darts Scorer</h1>
 
-    <div id="score-container">
-      <div id="player1-score" class="player-score">Player 1: <span id="score1">501</span></div>
-      <div id="player2-score" class="player-score">Player 2: <span id="score2">501</span></div>
+    <div id="score-grid">
+      <div class="score-box">
+        <h2>Player 1</h2>
+        <p>Score: <span id="score1">501</span></p>
+        <p>Avg: <span id="avg1">0.00</span></p>
+        <p>Darts: <span id="darts1">0</span></p>
+      </div>
+      <div class="score-box">
+        <h2>Player 2</h2>
+        <p>Score: <span id="score2">501</span></p>
+        <p>Avg: <span id="avg2">0.00</span></p>
+        <p>Darts: <span id="darts2">0</span></p>
+      </div>
+    </div>
+
+    <div id="checkout-section">
+      <h3>Checkout Suggestion</h3>
+      <p><span id="checkout">—</span></p>
     </div>
 
     <div id="input-section">
@@ -27,12 +42,6 @@
       <button id="undo-turn">Undo Turn</button>
       <button id="reset-game">Reset Game</button>
       <button id="toggle-dark">Toggle Dark Mode</button>
-    </div>
-
-    <div id="stats">
-      <p>Player 1 Avg: <span id="avg1">0.00</span></p>
-      <p>Player 2 Avg: <span id="avg2">0.00</span></p>
-      <p>Checkout Suggestion: <span id="checkout">—</span></p>
     </div>
   </div>
 
