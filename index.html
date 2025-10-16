@@ -1,577 +1,334 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Legion Darts Scorer v2.4</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legion Darts Scorer v2.4.1</title>
 <style>
-:root{
-  --bg:#f4fbff; --panel:#ffffff; --muted:#6b7a86;
-  --accent:#1e88ff; --accent-2:#0b66ff; --danger:#d64545; --green:#1f8a4c; --gold:#d4af37;
-  --section-gap:1.2rem; --inner-gap:0.6rem; --fast:0.28s; --slow:0.8s;
-  font-family:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  color-scheme: light;
-}
-:root.dark{
-  --bg:#071425; --panel:#0f1b26; --muted:#9aa4ae; --accent:#57a0ff; --accent-2:#8fc2ff; --danger:#ff7b7b;
-  color-scheme: dark;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);font-family:inherit; -webkit-font-smoothing:antialiased;}
-.app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;padding:12px;gap:var(--section-gap);position:relative;}
+  :root {
+    --bg: #f5f9ff;
+    --fg: #003366;
+    --accent: #007bff;
+    --card: #ffffff;
+  }
+  body.dark {
+    --bg: #0d1117;
+    --fg: #e6edf3;
+    --accent: #58a6ff;
+    --card: #161b22;
+  }
 
-/* faint dartboard background on start screen */
-.start-bg{background-image:
-  radial-gradient(circle at 50% 45%, rgba(11,102,255,0.03) 0, transparent 10%),
-  radial-gradient(circle at 30% 70%, rgba(11,102,255,0.02) 0, transparent 8%);
-  min-height:100vh;
-}
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    margin: 0;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+  }
 
-/* Header small */
-.header{display:flex;align-items:center;justify-content:space-between;padding:6px 4px}
-.logo{font-weight:700;color:var(--accent-2)}
-.version{font-size:12px;color:var(--muted)}
+  #startScreen, #gameScreen {
+    max-width: 480px;
+    margin: auto;
+    padding: 1rem;
+  }
 
-/* --- START SCREEN --- */
-.start-screen{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;min-height:60vh;background:
-  radial-gradient(circle at 50% 30%, rgba(11,102,255,0.02), transparent 15%);}
-.card{background:var(--panel);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(2,8,23,0.06);width:92%;max-width:420px}
-.input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(2,8,23,0.06);font-size:16px;margin-bottom:8px}
+  #gameScreen {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
 
-/* --- MAIN LAYOUT --- */
-.top{display:flex;gap:12px;align-items:stretch;height:28%}
-.player{background:var(--panel);flex:1;padding:10px;border-radius:12px;box-shadow:0 6px 20px rgba(3,50,90,0.04);position:relative;display:flex;flex-direction:column;justify-content:flex-start}
-.player.active{animation:pulse 1.6s infinite;border:1px solid rgba(11,102,255,0.06);box-shadow:0 14px 36px rgba(11,102,255,0.08)}
-@keyframes pulse{0%{box-shadow:0 8px 20px rgba(11,102,255,0.06)}50%{box-shadow:0 16px 40px rgba(11,102,255,0.1)}100%{box-shadow:0 8px 20px rgba(11,102,255,0.06)}}
-.player h3{margin:0;font-size:14px;color:var(--accent-2);font-weight:600}
-.score{font-size:34px;font-weight:800;margin:8px 0;color:var(--accent)}
-.darts-row{display:flex;gap:8px;margin-top:6px}
-.dart-chip{min-width:58px;padding:8px;border-radius:10px;background:#f3fbff;border:1px solid rgba(11,102,255,0.06);text-align:center;font-weight:700;cursor:pointer}
-.dart-chip.empty{opacity:0.45}
-.dart-val-line{margin-top:8px;color:var(--muted);font-size:13px}
-.threeDA{position:absolute;right:10px;top:10px;font-weight:700;font-size:12px}
-.threeDA.inactive{color:#9aa4ae}
+  .card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
 
-/* trolley icon */
-.trolley{position:absolute;right:10px;bottom:10px;background:linear-gradient(180deg,#fff,#f3fbff);padding:6px;border-radius:8px;border:1px solid rgba(11,102,255,0.06);cursor:default}
+  input {
+    padding: 0.5rem;
+    width: 80%;
+    margin: 0.3rem 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
 
-/* middle grid */
-.middle{height:52%;display:flex;flex-direction:column;gap:10px}
-.labels{display:flex;gap:8px;justify-content:center}
-.labels .lab{font-weight:700;color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;flex:1}
-.btn{background:var(--panel);border:0;padding:12px;border-radius:10px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(3,50,90,0.04);font-size:16px}
-.btn:active{transform:translateY(1px)}
-.btn.special{background:linear-gradient(180deg,#f8fbff,#eefbff);color:var(--accent-2)}
-.btn.noscore{background:linear-gradient(180deg,#fff7f7,#fff0f0);color:var(--muted)}
+  button {
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
 
-/* bottom controls */
-.bottom{height:20%;display:flex;align-items:center}
-.controls{display:flex;gap:8px;width:100%}
-.ctrl{flex:1;padding:12px;border-radius:12px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff;font-weight:800;cursor:pointer}
-.ctrl.ghost{background:var(--panel);color:var(--accent-2);border:1px solid rgba(3,50,90,0.06)}
+  button:disabled {
+    opacity: 0.5;
+  }
 
-/* modal & overlays */
-.modal-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;z-index:120}
-.modal{background:var(--panel);padding:16px;border-radius:12px;width:88%;max-width:420px;animation:fadeIn var(--slow) ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18vh;padding:10px 14px;background:rgba(2,8,23,0.8);color:white;border-radius:10px;z-index:200;opacity:0;transition:opacity .4s}
-.toast.show{opacity:1}
+  #scoreboard {
+    display: flex;
+    justify-content: space-around;
+  }
 
-/* floating label */
-.float-label{position:fixed;left:50%;transform:translateX(-50%);top:38%;background:var(--panel);padding:8px 12px;border-radius:10px;color:#072028;font-weight:800;box-shadow:0 10px 30px rgba(2,8,23,0.12);z-index:220;opacity:0;transition:opacity var(--fast)}
-.float-label.show{opacity:1}
+  .player {
+    flex: 1;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+  }
 
-/* small responsive tweak */
-@media (max-height:700px){
-  .top{height:26%}
-  .middle{height:56%}
-  .bottom{height:18%}
-}
+  .player.active {
+    background: rgba(0,123,255,0.1);
+  }
+
+  .score {
+    font-size: 2.2rem;
+    margin: 0.3rem 0;
+  }
+
+  .avg {
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+
+  #keypad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .dart-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+  }
+
+  .dart {
+    width: 2.2rem;
+    height: 2.2rem;
+    line-height: 2.2rem;
+    border-radius: 5px;
+    background: var(--card);
+    border: 1px solid #ccc;
+  }
+
+  #controls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  #darkToggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: var(--card);
+    color: var(--fg);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  #message {
+    font-weight: bold;
+    margin-top: 0.5rem;
+    display: none;
+  }
 </style>
 </head>
 <body>
 
-<div class="app start-bg" id="root">
-  <!-- START SCREEN -->
-  <div id="startScreen" class="start-screen" aria-live="polite">
-    <div style="display:flex;justify-content:space-between;align-items:center;width:92%;max-width:420px;margin:0 auto">
-      <div class="logo">Legion Darts</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <div class="version">v2.4</div>
-        <button id="themeToggleStart" title="Toggle theme" style="border:0;background:none;font-size:18px;cursor:pointer">🌙</button>
-      </div>
-    </div>
+<button id="darkToggle">☀️</button>
 
-    <div class="card" style="margin-top:8px">
-      <h2 style="margin:0 0 8px 0">Start Match</h2>
-      <input id="nameHome" class="input" placeholder="Home (P1)" style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-bottom:8px"/>
-      <input id="nameAway" class="input" placeholder="Away (P2)" style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-bottom:8px"/>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <label style="font-weight:700;color:var(--muted)">Best of</label>
-        <select id="bestOf" style="padding:8px;border-radius:8px">
-          <option value="1">1</option>
-          <option value="3" selected>3</option>
-          <option value="5">5</option>
-        </select>
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px">
-        <button id="resumeBtn" class="ctrl ghost" style="padding:8px 12px">Resume</button>
-        <button id="startBtn" class="ctrl" style="padding:8px 12px">Start Game</button>
-      </div>
-      <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:12px">Legion Darts (v2.4)</div>
-    </div>
-  </div>
-
-  <!-- MAIN APP -->
-  <div id="main" style="display:none;height:100%;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div class="logo" style="font-size:15px">Legion Darts <span class="version" style="margin-left:8px;font-weight:600">v2.4</span></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="statsBtn" title="Stats" style="border:0;background:none;font-size:18px;cursor:pointer">📊</button>
-        <button id="themeToggle" title="Toggle theme" style="border:0;background:none;font-size:18px;cursor:pointer">🌙</button>
-      </div>
-    </div>
-
-    <!-- Top (scores) -->
-    <div class="top" style="margin-top:6px">
-      <div class="player active" id="player0" aria-live="polite">
-        <h3 id="p0name">Home (P1)</h3>
-        <div class="score" id="p0score">501</div>
-        <div class="darts-row" id="chips0">
-          <div class="dart-chip empty" data-index="0">D1</div>
-          <div class="dart-chip empty" data-index="1">D2</div>
-          <div class="dart-chip empty" data-index="2">D3</div>
-        </div>
-        <div class="dart-val-line" id="vals0">- | - | -</div>
-        <div class="threeDA" id="da0">3DA: 0.00</div>
-      </div>
-
-      <div class="player" id="player1" aria-live="polite">
-        <h3 id="p1name">Away (P2)</h3>
-        <div class="score" id="p1score">501</div>
-        <div class="darts-row" id="chips1">
-          <div class="dart-chip empty" data-index="0">D1</div>
-          <div class="dart-chip empty" data-index="1">D2</div>
-          <div class="dart-chip empty" data-index="2">D3</div>
-        </div>
-        <div class="dart-val-line" id="vals1">- | - | -</div>
-        <div class="threeDA inactive" id="da1">3DA: 0.00</div>
-        <div class="trolley" title="Checkout helper (future)">🧺</div>
-      </div>
-    </div>
-
-    <!-- MIDDLE: 5x5 grid -->
-    <div class="middle">
-      <div class="labels" style="justify-content:center">
-        <div class="lab">Dart 1</div><div class="lab">Dart 2</div><div class="lab">Dart 3</div>
-      </div>
-      <div class="grid" id="grid">
-        <!-- column 1 special -->
-        <button class="btn special" data-act="double">D</button>
-        <button class="btn" data-num="1">1</button>
-        <button class="btn" data-num="2">2</button>
-        <button class="btn" data-num="3">3</button>
-        <button class="btn" data-num="4">4</button>
-
-        <button class="btn special" data-act="treble">T</button>
-        <button class="btn" data-num="5">5</button>
-        <button class="btn" data-num="6">6</button>
-        <button class="btn" data-num="7">7</button>
-        <button class="btn" data-num="8">8</button>
-
-        <button class="btn special" data-act="25">25</button>
-        <button class="btn" data-num="9">9</button>
-        <button class="btn" data-num="10">10</button>
-        <button class="btn" data-num="11">11</button>
-        <button class="btn" data-num="12">12</button>
-
-        <button class="btn special" data-act="bull">Bull</button>
-        <button class="btn" data-num="13">13</button>
-        <button class="btn" data-num="14">14</button>
-        <button class="btn" data-num="15">15</button>
-        <button class="btn" data-num="16">16</button>
-
-        <button class="btn noscore" data-act="noscore">No Score</button>
-        <button class="btn" data-num="17">17</button>
-        <button class="btn" data-num="18">18</button>
-        <button class="btn" data-num="19">19</button>
-        <button class="btn" data-num="20">20</button>
-      </div>
-    </div>
-
-    <!-- BOTTOM: controls row -->
-    <div class="bottom">
-      <div class="controls">
-        <button id="coinBtn" class="ctrl ghost">🪙</button>
-        <button id="undoDart" class="ctrl ghost">Undo Dart</button>
-        <button id="undoTurn" class="ctrl ghost">Undo This Turn</button>
-        <button id="undoLastPlayer" class="ctrl ghost">Undo Last Player</button>
-        <button id="submitBtn" class="ctrl">Submit Turn</button>
-      </div>
-    </div>
-  </div>
+<!-- START SCREEN -->
+<div id="startScreen" class="card">
+  <h1>🎯 Legion Darts Scorer</h1>
+  <input id="homeName" placeholder="Home Player Name"><br>
+  <input id="awayName" placeholder="Away Player Name"><br>
+  <label>Best of: <input id="bestOf" type="number" min="1" max="9" value="3" style="width:50px"></label><br><br>
+  <button id="startGame">Start Game</button>
+  <p style="margin-top:1rem;font-size:0.8rem;">Version v2.4.1</p>
 </div>
 
-<!-- STATS MODAL -->
-<div class="modal-back" id="statsModal">
-  <div class="modal">
-    <button id="closeStats" style="float:right;border:0;background:none;font-size:20px;cursor:pointer">✖</button>
-    <h3 style="margin-top:0">Stats (current leg)</h3>
-    <div id="statsBody" style="color:var(--muted)"></div>
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+  <div id="scoreboard" class="card">
+    <div class="player active" id="home">
+      <h2>Home (P1)</h2>
+      <div class="score" id="score1">501</div>
+      <div class="avg" id="avg1">3DA: 0.00</div>
+      <div class="dart-row" id="darts1">
+        <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
+      </div>
+    </div>
+    <div class="player" id="away">
+      <h2>Away (P2)</h2>
+      <div class="score" id="score2">501</div>
+      <div class="avg" id="avg2">3DA: 0.00</div>
+      <div class="dart-row" id="darts2">
+        <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
+      </div>
+    </div>
   </div>
-</div>
 
-<div class="float-label" id="floatLabel" aria-hidden="true"></div>
-<div class="toast" id="toast"></div>
+  <div id="keypad" class="card">
+    <button data-action="D">D</button>
+    <button data-action="T">T</button>
+    <button data-action="25">25</button>
+    <button data-action="BULL">Bull</button>
+    <button data-action="NS">No Score</button>
+
+    <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
+    <button>6</button><button>7</button><button>8</button><button>9</button><button>10</button>
+    <button>11</button><button>12</button><button>13</button><button>14</button><button>15</button>
+    <button>16</button><button>17</button><button>18</button><button>19</button><button>20</button>
+  </div>
+
+  <div id="controls">
+    <button id="statsBtn">📊</button>
+    <button id="undoDart">↩️ Dart</button>
+    <button id="undoTurn">↩️ Turn</button>
+    <button id="undoLast">↩️ Prev</button>
+  </div>
+
+  <button id="submitTurn" style="margin-top:0.8rem;width:90%;max-width:400px;">Submit Turn</button>
+  <div id="message"></div>
+</div>
 
 <script>
-/* Legion Darts Scorer v2.4 (polished) JS */
-const START = 501;
-// --- Start screen logic ---
-const startBtn = document.getElementById('startGame');
-const startScreen = document.getElementById('startScreen');
-const gameScreen = document.getElementById('gameScreen');
-const homeInput = document.getElementById('homeName');
-const awayInput = document.getElementById('awayName');
-
-if(startBtn){
-  startBtn.addEventListener('click', () => {
-    const homeName = homeInput.value || 'Home';
-    const awayName = awayInput.value || 'Away';
-    document.querySelector('#home h2').textContent = `${homeName} (P1)`;
-    document.querySelector('#away h2').textContent = `${awayName} (P2)`;
-    startScreen.style.display = 'none';
-    gameScreen.style.display = 'block';
-  });
-const STORAGE = 'legion:scorer:v2.4';
-let state = {
-  players: [
-    { name: 'Home (P1)', score: START, dartsThrown:0, highestCheckout:0 },
-    { name: 'Away (P2)', score: START, dartsThrown:0, highestCheckout:0 }
-  ],
-  current: 0,
-  staged: [[],[]],
-  history: [], // confirmed turns
-  pendingMultiplier: null,
-  bestOf: 3,
-  dark: false
+// ---------- DARK MODE ----------
+const darkToggle=document.getElementById('darkToggle');
+darkToggle.onclick=()=>{
+  document.body.classList.toggle('dark');
+  darkToggle.textContent=document.body.classList.contains('dark')?'🌙':'☀️';
 };
-// load saved if exists
-try{ const s = JSON.parse(localStorage.getItem(STORAGE)); if(s) Object.assign(state,s); }catch(e){}
 
-/* DOM refs */
-const startScreen = el('startScreen'), main = el('main');
-const nameHome = el('nameHome'), nameAway = el('nameAway'), bestOf = el('bestOf');
-const startBtn = el('startBtn'), resumeBtn = el('resumeBtn');
-const themeToggle = el('themeToggle'), themeToggleStart = el('themeToggleStart');
-const p0name = el('p0name'), p1name = el('p1name');
-const p0score = el('p0score'), p1score = el('p1score');
-const chips0 = el('chips0'), chips1 = el('chips1'), vals0 = el('vals0'), vals1 = el('vals1');
-const da0 = el('da0'), da1 = el('da1');
-const grid = el('grid');
-const statsModal = el('statsModal'), statsBtn = el('statsBtn'), closeStats = el('closeStats'), statsBody = el('statsBody');
-const submitBtn = el('submitBtn'), undoDart = el('undoDart'), undoTurn = el('undoTurn'), undoLastPlayer = el('undoLastPlayer'), coinBtn = el('coinBtn');
-const floatLabel = el('floatLabel'), toast = el('toast');
+// ---------- START SCREEN HANDLING ----------
+const startBtn=document.getElementById('startGame');
+const startScreen=document.getElementById('startScreen');
+const gameScreen=document.getElementById('gameScreen');
+const homeInput=document.getElementById('homeName');
+const awayInput=document.getElementById('awayName');
 
-/* helper */
-function el(id){ return document.getElementById(id); }
-function save(){ try{ localStorage.setItem(STORAGE, JSON.stringify(state)); }catch(e){} }
-function toastShow(msg, ms=1200){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), ms); }
-
-/* theme */
-function applyTheme(){
-  if(state.dark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
-  themeToggle.textContent = state.dark ? '☀️' : '🌙';
-  themeToggleStart.textContent = state.dark ? '☀️' : '🌙';
-}
-themeToggle.addEventListener('click', ()=>{ state.dark = !state.dark; applyTheme(); save(); });
-themeToggleStart.addEventListener('click', ()=>{ state.dark = !state.dark; applyTheme(); save(); });
-
-/* Start / Resume logic */
-startBtn.addEventListener('click', ()=>{
-  state.players[0].name = nameHome.value.trim() || 'Home (P1)';
-  state.players[1].name = nameAway.value.trim() || 'Away (P2)';
-  state.bestOf = parseInt(bestOf.value,10) || 3;
-  // reset scores/history for new match
-  state.players[0].score = START; state.players[1].score = START;
-  state.history = []; state.staged = [[],[]]; state.current = 0;
-  save(); showMain();
+startBtn.addEventListener('click',()=>{
+  const homeName=homeInput.value||'Home';
+  const awayName=awayInput.value||'Away';
+  document.querySelector('#home h2').textContent=`${homeName} (P1)`;
+  document.querySelector('#away h2').textContent=`${awayName} (P2)`;
+  startScreen.style.opacity='0';
+  setTimeout(()=>{
+    startScreen.style.display='none';
+    gameScreen.style.display='block';
+    gameScreen.style.opacity='1';
+  },500);
 });
-resumeBtn.addEventListener('click', ()=>{ showMain(); });
 
-function showMain(){
-  startScreen.style.display='none';
-  main.style.display='flex';
-  // populate names if from state
-  p0name.textContent = state.players[0].name;
-  p1name.textContent = state.players[1].name;
-  render();
-  applyTheme();
+// ---------- GAME LOGIC ----------
+const scores=[501,501];
+let active=0;
+let currentDarts=[[],[]];
+let multiplier=null;
+const scoreEls=[document.getElementById('score1'),document.getElementById('score2')];
+const dartEls=[document.getElementById('darts1'),document.getElementById('darts2')];
+const avgEls=[document.getElementById('avg1'),document.getElementById('avg2')];
+const msg=document.getElementById('message');
+let allDarts=[[],[]];
+
+function showMessage(text){
+  msg.textContent=text;
+  msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',1500);
 }
 
-/* Initial: if state has been started before, show start panel with values */
-nameHome.value = state.players[0].name || '';
-nameAway.value = state.players[1].name || '';
-bestOf.value = state.bestOf || 3;
-
-/* GRID input */
-grid.addEventListener('click', (ev)=>{
-  if(statsModal.style.display === 'flex') return; // paused
-  const btn = ev.target.closest('button');
-  if(!btn) return;
-  const act = btn.dataset.act, num = btn.dataset.num ? parseInt(btn.dataset.num,10) : null;
-  if(act === 'double'){ state.pendingMultiplier = 2; toastShow('Double selected'); return; }
-  if(act === 'treble'){ state.pendingMultiplier = 3; toastShow('Treble selected'); return; }
-  if(act === '25'){ pushDart({label:'25', val:25, mult:1, base:25}); return; }
-  if(act === 'bull'){ pushDart({label:'Bull', val:50, mult:2, base:25}); return; }
-  if(act === 'noscore'){ pushDart({label:'0', val:0, mult:0, base:0}); return; }
-  if(num !== null){
-    const mult = state.pendingMultiplier || 1;
-    const label = mult === 1 ? String(num) : (mult === 2 ? 'D'+num : 'T'+num);
-    const val = num * mult;
-    pushDart({label, val, mult, base:num});
-    state.pendingMultiplier = null;
-    render();
+function updateDarts(){
+  for(let i=0;i<2;i++){
+    const dset=dartEls[i].querySelectorAll('.dart');
+    dset.forEach((d,j)=>{
+      d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';
+      d.classList.toggle('empty',currentDarts[i][j]===undefined);
+    });
   }
+}
+
+function switchPlayer(){
+  document.getElementById('home').classList.toggle('active');
+  document.getElementById('away').classList.toggle('active');
+  active=1-active;
+}
+
+function calc3DA(i){
+  let thrown=allDarts[i]||[];
+  if(!thrown.length)return '3DA: 0.00';
+  let total=thrown.reduce((a,b)=>a+b,0);
+  return '3DA: '+(total/thrown.length*3).toFixed(2);
+}
+
+function addDart(value){
+  if(currentDarts[active].length>=3)return;
+  currentDarts[active].push(value);
+  updateDarts();
+}
+
+document.getElementById('keypad').addEventListener('click',e=>{
+  if(e.target.tagName!=='BUTTON')return;
+  const btn=e.target;
+  const act=btn.dataset.action;
+  if(act==='D'||act==='T'){multiplier=act;return;}
+  let val=0;
+  if(act==='25')val=25;
+  else if(act==='BULL')val=50;
+  else if(act==='NS')val=0;
+  else val=parseInt(btn.textContent);
+  if(multiplier==='D')val*=2;
+  if(multiplier==='T')val*=3;
+  multiplier=null;
+  addDart(val);
 });
 
-/* pushDart - staged and temporary score adjust */
-function pushDart(d){
-  const p = state.current;
-  if(state.staged[p].length >= 3){
-    toastShow('Max 3 darts — submit or undo');
+document.getElementById('undoDart').onclick=()=>{
+  currentDarts[active].pop();
+  updateDarts();
+};
+document.getElementById('undoTurn').onclick=()=>{
+  currentDarts[active]=[];
+  updateDarts();
+};
+document.getElementById('undoLast').onclick=()=>{
+  switchPlayer();
+  currentDarts[active]=[];
+  updateDarts();
+};
+
+document.getElementById('submitTurn').onclick=()=>{
+  const sum=currentDarts[active].reduce((a,b)=>a+b,0);
+  const newScore=scores[active]-sum;
+  if(newScore<0){
+    showMessage('BUST!');
+    currentDarts[active]=[];
+    updateDarts();
+    switchPlayer();
     return;
   }
-  // if editing index exists, replace
-  if(typeof state.staged[p].editingIndex === 'number'){
-    const idx = state.staged[p].editingIndex;
-    // revert previous effect
-    state.players[p].score += state.staged[p][idx].val;
-    // replace
-    state.staged[p][idx] = d;
-    delete state.staged[p].editingIndex;
-    state.players[p].score -= d.val;
-    showFloating(`${d.label} → ${d.val}`);
-    render();
-    save();
-    return;
-  }
-  if(state.staged[p].length === 0) state.turnStart = state.players[p].score;
-  state.staged[p].push(d);
-  state.players[p].score -= d.val;
-  showFloating(`${d.label} → ${d.val}`);
-  render();
-  save();
-}
+  scores[active]=newScore;
+  scoreEls[active].textContent=scores[active];
+  allDarts[active].push(...currentDarts[active]);
+  avgEls[active].textContent=calc3DA(active);
+  currentDarts[active]=[];
+  updateDarts();
+  if(newScore===0){showMessage('Game Shot!');}
+  switchPlayer();
+};
 
-/* chip edit */
-chips0.addEventListener('click', (e)=>onChipClick(e,0));
-chips1.addEventListener('click', (e)=>onChipClick(e,1));
-function onChipClick(ev, playerIndex){
-  const chip = ev.target.closest('.dart-chip');
-  if(!chip) return;
-  const idx = parseInt(chip.dataset.index,10);
-  if(!Number.isFinite(idx)) return;
-  if(!state.staged[playerIndex][idx]){ toastShow('No dart in this slot — tap a number'); return; }
-  // revert effects and mark editing index
-  const d = state.staged[playerIndex][idx];
-  state.players[playerIndex].score += d.val;
-  state.staged[playerIndex].editingIndex = idx;
-  state.current = playerIndex;
-  render();
-  toastShow(`Editing dart ${idx+1}`);
-}
-
-/* Undo staged last dart */
-undoDart.addEventListener('click', ()=>{
-  const p = state.current;
-  if(state.staged[p].length === 0){ toastShow('No staged darts'); return; }
-  const removed = state.staged[p].pop();
-  state.players[p].score += removed.val;
-  delete state.staged[p].editingIndex;
-  render(); save();
-});
-
-/* Undo This Turn (clear staged and revert) */
-undoTurn.addEventListener('click', ()=>{
-  const p = state.current;
-  if(state.staged[p].length === 0){ toastShow('Nothing to undo'); return; }
-  if(typeof state.turnStart !== 'undefined') state.players[p].score = state.turnStart;
-  state.staged[p] = []; delete state.turnStart; delete state.staged[p].editingIndex;
-  render(); save();
-});
-
-/* Undo Last Player's last confirmed turn & switch back */
-undoLastPlayer.addEventListener('click', ()=>{
-  if(state.history.length === 0){ toastShow('No confirmed turns'); return; }
-  const last = state.history.pop();
-  state.players[last.player].score = last.startScore;
-  state.current = last.player;
-  // do not re-add staged darts
-  render(); save();
-  toastShow('Last confirmed turn undone');
-});
-
-/* Submit Turn */
-submitBtn.addEventListener('click', ()=>{
-  const p = state.current;
-  const staged = state.staged[p];
-  if(staged.length === 0){ toastShow('Enter at least one dart'); return; }
-  const startScore = (typeof state.turnStart === 'number') ? state.turnStart : (state.players[p].score + staged.reduce((s,d)=>s+d.val,0));
-  const turnTotal = staged.reduce((s,d)=>s+d.val,0);
-  const final = startScore - turnTotal;
-
-  let bust = false, finished = false;
-  if(final < 0) bust = true;
-  else if(final === 1) bust = true;
-  else if(final === 0){
-    const last = staged[staged.length-1];
-    const isDoubleBull = last && last.label === 'Bull' && state.doubleOut;
-    const isDouble = last && last.mult === 2;
-    if(state.doubleOut){
-      if(isDouble || isDoubleBull) finished = true; else bust = true;
-    } else finished = true;
-  }
-
-  if(bust){
-    // record bust
-    state.history.push({ player:p, startScore, darts: staged.slice(), newScore: startScore, turnTotal:0, bust:true, legWon:false, legIndex:computeLegIndex() });
-    render(); save();
-    showFloating('BUST!');
-    setTimeout(()=>{
-      state.players[p].score = startScore;
-      state.staged[p] = [];
-      delete state.turnStart;
-      render();
-      // switch player
-      state.current = 1 - p;
-      render();
-      save();
-    }, 2000);
-    return;
-  }
-
-  if(finished){
-    state.history.push({ player:p, startScore, darts: staged.slice(), newScore: 0, turnTotal, bust:false, legWon:true, legIndex:computeLegIndex() });
-    if(turnTotal > state.players[p].highestCheckout) state.players[p].highestCheckout = turnTotal;
-    showFloating('LEG WON!');
-    // simple leg reset
-    state.players[0].score = START; state.players[1].score = START;
-    state.staged[p] = []; delete state.turnStart;
-    render(); save();
-    return;
-  }
-
-  // normal apply
-  state.history.push({ player:p, startScore, darts: staged.slice(), newScore: final, turnTotal, bust:false, legWon:false, legIndex:computeLegIndex() });
-  state.players[p].score = final;
-  state.staged[p] = []; delete state.turnStart;
-  render(); save();
-  // switch
-  state.current = 1 - p;
-  render();
-});
-
-/* Stats modal (pause UI) */
-statsBtn.addEventListener('click', ()=>{ openStats(); });
-closeStats.addEventListener('click', ()=>{ closeStats(); });
-
-function openStats(){
-  // compute stats
-  const h3 = compute3DA(0).toFixed(2), a3 = compute3DA(1).toFixed(2);
-  const f0 = computeFirst9(0).toFixed(1), f1 = computeFirst9(1).toFixed(1);
-  const h0 = findHigh(0), h1 = findHigh(1);
-  statsBody.innerHTML = `<strong>Home</strong> 3DA: ${h3} • First9: ${f0} • High turn: ${h0}<br/><br/><strong>Away</strong> 3DA: ${a3} • First9: ${f1} • High turn: ${h1}`;
-  statsModal.style.display = 'flex';
-}
-function closeStats(){ statsModal.style.display = 'none'; }
-
-/* compute helpers */
-function compute3DA(player){
-  let pts=0,darts=0;
-  state.history.forEach(h=>{
-    if(h.player===player){
-      if(h.bust) darts += h.darts.length;
-      else { darts += h.darts.length; pts += h.turnTotal; }
-    }
-  });
-  if(darts===0) return 0.0;
-  return (pts / darts) * 3;
-}
-function computeFirst9(player){
-  const leg = computeLegIndex();
-  let seq=[];
-  state.history.forEach(h=>{
-    if(h.legIndex===leg && h.player===player){
-      if(h.bust) { for(let i=0;i<h.darts.length;i++) seq.push(0); }
-      else h.darts.forEach(d=>seq.push(d.val));
-    }
-  });
-  if(state.current===player) state.staged[player].forEach(d=>seq.push(d.val));
-  const f = seq.slice(0,9);
-  if(f.length===0) return 0.0;
-  return (f.reduce((a,b)=>a+b,0) / f.length) * 3;
-}
-function computeLegIndex(){
-  let idx = 0;
-  state.history.forEach(h=>{ if(h.legWon) idx++; });
-  return idx;
-}
-function findHigh(player){
-  let best=0;
-  state.history.forEach(h=>{ if(h.player===player && !h.bust && h.turnTotal>best) best=h.turnTotal; });
-  return best;
-}
-
-/* floating & toast */
-function showFloating(txt){ floatLabel.textContent = txt; floatLabel.classList.add('show'); setTimeout(()=> floatLabel.classList.remove('show'), 600); }
-function toastShow(txt, ms=900){ toast.textContent = txt; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), ms); }
-
-/* render UI */
-function render(){
-  // names & scores
-  p0name.textContent = state.players[0].name;
-  p1name.textContent = state.players[1].name;
-  p0score.textContent = Math.max(0, state.players[0].score);
-  p1score.textContent = Math.max(0, state.players[1].score);
-  // staged chips & values
-  [0,1].forEach(p=>{
-    const chips = (p===0 ? chips0 : chips1).querySelectorAll('.dart-chip');
-    for(let i=0;i<3;i++){
-      const d = state.staged[p][i];
-      const chip = chips[i];
-      if(d){ chip.textContent = d.label; chip.classList.remove('empty'); chip.style.background = chipBg(d); }
-      else{ chip.textContent = 'D'+(i+1); chip.classList.add('empty'); chip.style.background = ''; }
-    }
-    const vals = state.staged[p].map(d=>d?d.val:'-').join(' | ');
-    (p===0?vals0:vals1).textContent = vals || '- | - | -';
-    // 3DA
-    const da = compute3DA(p);
-    (p===0?da0:da1).textContent = '3DA: ' + da.toFixed(2);
-    (p===0?da0:da1).className = 'threeDA' + (state.current===p ? '' : ' inactive');
-  });
-  // highlight current
-  el('player0').classList.toggle('active', state.current===0);
-  el('player1').classList.toggle('active', state.current===1);
-  save();
-}
-
-function chipBg(d){
-  if(!d) return '';
-  if(d.label === 'Bull') return 'linear-gradient(90deg,#ffd700,#ffec8a)';
-  if(d.mult === 3) return '#ffecec';
-  if(d.mult === 2) return '#e6f7ff';
-  return '#f7fbff';
-}
-
-/* initial render */
-applyTheme(); render();
-
-/* expose for debug */
-window._legion = { state, render, save };
-
+// ---------- STATS MODAL (future placeholder) ----------
+document.getElementById('statsBtn').onclick=()=>showMessage('Stats overlay coming soon');
 </script>
 </body>
 </html>
