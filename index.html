@@ -1,245 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Legion Darts Scorer v2.3</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Legion Darts Scorer v2.4</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: 'Montserrat', sans-serif;
-    background: #f0f8ff;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  h1 { margin-top: 10px; color: #003366; }
-  .scoreboard {
-    display: flex;
-    justify-content: space-around;
-    width: 95%;
-    margin: 10px 0;
-    position: relative;
-  }
-  .player {
-    text-align: center;
-    padding: 10px;
-    border: 2px solid #003366;
-    border-radius: 10px;
-    width: 45%;
-    position: relative;
-  }
-  .active {
-    animation: pulse 1s infinite;
-    border-color: #0066cc;
-  }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 5px #0066cc; }
-    50% { box-shadow: 0 0 15px #0066cc; }
-    100% { box-shadow: 0 0 5px #0066cc; }
-  }
-  .dart-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-gap: 8px;
-    width: 95%;
-    margin-bottom: 10px;
-  }
-  button {
-    padding: 12px;
-    font-size: 18px;
-    border-radius: 8px;
-    border: none;
-    background-color: #0073e6;
-    color: white;
-  }
-  button:hover { background-color: #005bb5; }
-  .stats-overlay {
-    display: none;
-    position: fixed;
-    top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-  }
-  .stats-content {
-    background: #f0f8ff;
-    padding: 20px;
-    border-radius: 15px;
-    width: 85%;
-    max-width: 400px;
-    text-align: center;
-    animation: fadeIn 0.8s;
-  }
-  .close-btn {
-    position: absolute;
-    top: 10px; right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #003366;
-  }
-  @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
-  .dart-value { font-size: 14px; color: #003366; margin-top: 2px; }
-  .message { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-             font-size:32px; color:red; display:none; font-weight:bold; }
-  .threeDA { font-size: 14px; color:red; margin-top:4px; }
+:root {
+  --blue:#1e90ff;
+  --white:#f9f9f9;
+  --green:#228b22;
+  --red:#d32f2f;
+  --gold:#d4af37;
+  --section-gap:1.2rem;
+  --inner-gap:0.6rem;
+  font-family:'Montserrat',sans-serif;
+}
+body {
+  background:#101820;
+  color:var(--white);
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  height:100vh;
+  overflow:hidden;
+}
+section{width:100%;max-width:480px;padding-inline:3vw;}
+.top-section{margin-bottom:var(--section-gap);}
+.middle-section{margin-bottom:var(--section-gap);}
+.player-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:var(--inner-gap);
+}
+.player{
+  flex:1;
+  margin:0 0.3rem;
+  padding:0.5rem;
+  border-radius:0.5rem;
+  text-align:center;
+  background:#182533;
+  position:relative;
+  transition:box-shadow .4s ease;
+}
+.player.active{
+  box-shadow:0 0 8px 2px var(--blue);
+  animation:pulse 1.6s infinite;
+}
+@keyframes pulse{0%{box-shadow:0 0 4px var(--blue);}50%{box-shadow:0 0 12px var(--blue);}100%{box-shadow:0 0 4px var(--blue);}}
+.player h2{margin:0;font-size:1.1rem;}
+.score{font-size:2rem;font-weight:600;margin:0.2rem 0;}
+.darts{display:flex;justify-content:center;gap:0.4rem;}
+.dart{
+  background:#243447;
+  padding:0.2rem 0.4rem;
+  border-radius:0.3rem;
+  min-width:1.6rem;
+}
+.dart.empty{opacity:0.4;}
+.three-da{font-size:0.8rem;color:var(--red);position:absolute;bottom:0.3rem;right:0.4rem;}
+
+#statsBtn{
+  position:absolute;
+  top:0.3rem;
+  right:0.8rem;
+  background:none;
+  border:none;
+  color:var(--white);
+  font-size:1.4rem;
+  cursor:pointer;
+}
+
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-gap:var(--inner-gap);
+}
+.keypad button{
+  background:#243447;
+  color:var(--white);
+  border:none;
+  border-radius:0.4rem;
+  padding:0.7rem 0;
+  font-size:1rem;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.keypad button:active{background:#3a556b;}
+.keypad button.special{background:#1a3b5d;}
+
+.bottom-buttons{
+  display:flex;
+  justify-content:space-between;
+  gap:var(--inner-gap);
+}
+.bottom-buttons button{
+  flex:1;
+  background:#243447;
+  color:var(--white);
+  border:none;
+  border-radius:0.4rem;
+  padding:0.7rem 0.3rem;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.bottom-buttons button:active{background:#3a556b;}
+
+/* overlay modal */
+#statsModal{
+  display:none;
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.85);
+  color:#fff;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:100;
+  animation:fadeIn 0.8s ease;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal-content{
+  background:#182533;
+  border-radius:0.6rem;
+  padding:1rem 1.4rem;
+  text-align:center;
+  width:80%;
+  max-width:300px;
+}
+#closeModal{
+  background:none;border:none;color:#fff;font-size:1.4rem;
+  position:absolute;top:1rem;right:1.4rem;cursor:pointer;
+}
+
+#message{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.7);
+  color:#fff;
+  padding:0.6rem 1rem;
+  border-radius:0.4rem;
+  display:none;
+  font-size:1.2rem;
+}
 </style>
 </head>
 <body>
 
-<h1>Legion Darts Scorer v2.3</h1>
-
-<div class="scoreboard">
-  <div id="home" class="player active">
-    Home (P1)<br>
-    <span id="home-score">501</span>
-    <div class="threeDA" id="home-3da"></div>
-    <div id="home-darts" class="dart-value"></div>
+<section class="top-section">
+  <div class="player-row">
+    <div class="player active" id="home">
+      <h2>Home (P1)</h2>
+      <p class="score" id="score1">501</p>
+      <div class="darts" id="darts1">
+        <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
+      </div>
+      <div class="three-da" id="avg1">3DA: 0.00</div>
+    </div>
+    <div class="player" id="away">
+      <h2>Away (P2)</h2>
+      <p class="score" id="score2">501</p>
+      <div class="darts" id="darts2">
+        <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
+      </div>
+      <div class="three-da" id="avg2">3DA: 0.00</div>
+    </div>
+    <button id="statsBtn">📊</button>
   </div>
-  <div id="away" class="player">
-    Away (P2)<br>
-    <span id="away-score">501</span>
-    <div class="threeDA" id="away-3da"></div>
-    <div id="away-darts" class="dart-value"></div>
+</section>
+
+<section class="middle-section">
+  <div class="keypad" id="keypad">
+    <button class="special" data-action="D">D</button>
+    <button>1</button><button>2</button><button>3</button><button>4</button>
+    <button class="special" data-action="T">T</button>
+    <button>5</button><button>6</button><button>7</button><button>8</button>
+    <button class="special" data-action="25">25</button>
+    <button>9</button><button>10</button><button>11</button><button>12</button>
+    <button class="special" data-action="BULL">Bull</button>
+    <button>13</button><button>14</button><button>15</button><button>16</button>
+    <button class="special" data-action="NS">No Score</button>
+    <button>17</button><button>18</button><button>19</button><button>20</button>
   </div>
-</div>
+</section>
 
-<div class="message" id="message"></div>
+<section class="bottom-section">
+  <div class="bottom-buttons">
+    <button id="undoDart">Undo Dart</button>
+    <button id="undoTurn">Undo Turn</button>
+    <button id="undoLast">Undo Last P.</button>
+    <button id="coinBtn">🪙</button>
+    <button id="submitTurn">Submit</button>
+  </div>
+</section>
 
-<div class="dart-buttons">
-  <button onclick="setMultiplier('D')">D</button>
-  <button onclick="setMultiplier('T')">T</button>
-  <button onclick="setMultiplier('1')">1</button>
-  <button onclick="setMultiplier('2')">2</button>
-
-  <button onclick="setMultiplier('3')">3</button>
-  <button onclick="setMultiplier('4')">4</button>
-  <button onclick="setMultiplier('5')">5</button>
-  <button onclick="setMultiplier('6')">6</button>
-
-  <button onclick="setMultiplier('7')">7</button>
-  <button onclick="setMultiplier('8')">8</button>
-  <button onclick="setMultiplier('9')">9</button>
-  <button onclick="setMultiplier('10')">10</button>
-
-  <button onclick="setMultiplier('11')">11</button>
-  <button onclick="setMultiplier('12')">12</button>
-  <button onclick="setMultiplier('13')">13</button>
-  <button onclick="setMultiplier('14')">14</button>
-
-  <button onclick="setMultiplier('15')">15</button>
-  <button onclick="setMultiplier('16')">16</button>
-  <button onclick="setMultiplier('17')">17</button>
-  <button onclick="setMultiplier('18')">18</button>
-
-  <button onclick="setMultiplier('19')">19</button>
-  <button onclick="setMultiplier('20')">20</button>
-  <button onclick="setMultiplier('25')">25</button>
-  <button onclick="setMultiplier('B')">Bull</button>
-
-  <button onclick="showStats()">📊</button>
-  <button onclick="undoLastDart()">↩️ Dart</button>
-  <button onclick="submitTurn()">✔️ Turn</button>
-  <button onclick="undoLastTurn()">↩️ Turn</button>
-</div>
-
-<div class="stats-overlay" id="statsOverlay">
-  <div class="stats-content">
-    <span class="close-btn" onclick="closeStats()">×</span>
-    <h2>Stats Overlay</h2>
-    <p id="statsText"></p>
+<div id="statsModal" class="modal">
+  <button id="closeModal">✖</button>
+  <div class="modal-content">
+    <h3>Leg Stats</h3>
+    <p id="statsText">Coming soon…</p>
   </div>
 </div>
+
+<div id="message"></div>
 
 <script>
-let homeScore = 501;
-let awayScore = 501;
-let currentPlayer = 'home';
-let dartsThisTurn = [];
-let allDarts = { home: [], away: [] };
-let multiplier = 1;
+const scores=[501,501];
+let active=0;
+let currentDarts=[[],[]];
+let multiplier=null;
 
-function setMultiplier(val){
-  if(val === 'D'){ multiplier = 2; return; }
-  if(val === 'T'){ multiplier = 3; return; }
-  if(val === 'B'){ val = 25; multiplier = 2; } 
-  val = parseInt(val);
-  recordDart(val * multiplier, val + (multiplier>1? ` (${multiplier}x)` : '' ));
-  multiplier = 1; // reset after use
+const scoreEls=[document.getElementById('score1'),document.getElementById('score2')];
+const dartEls=[document.getElementById('darts1'),document.getElementById('darts2')];
+const avgEls=[document.getElementById('avg1'),document.getElementById('avg2')];
+const msg=document.getElementById('message');
+
+function showMessage(text){
+  msg.textContent=text;
+  msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',1500);
 }
 
-function recordDart(scoreVal, label){
-  if(dartsThisTurn.length >=3){ showMessage("Max 3 darts!"); return; }
-  dartsThisTurn.push({score:scoreVal, label:label});
-  allDarts[currentPlayer].push({score:scoreVal, label:label});
-  updateScoreboard();
-}
-
-function updateScoreboard(){
-  let scoreEl = document.getElementById(currentPlayer+'-score');
-  let dartsEl = document.getElementById(currentPlayer+'-darts');
-  let currentScore = (currentPlayer==='home'? homeScore: awayScore);
-  let turnScore = dartsThisTurn.reduce((a,b)=>a+b.score,0);
-  let newScore = currentScore - turnScore;
-  if(newScore<0){ showMessage("BUST!"); dartsThisTurn=[]; updateScoreboard(); return; }
-  scoreEl.textContent = newScore;
-  dartsEl.innerHTML = dartsThisTurn.map(d=>d.label).join(' | ');
-  document.getElementById(currentPlayer+'-3da').textContent = `3DA: ${calculate3DA(currentPlayer)}`;
-}
-
-function calculate3DA(player){
-  let darts = allDarts[player].map(d=>d.score);
-  let total = darts.reduce((a,b)=>a+b,0);
-  return darts.length? (total/darts.length*3).toFixed(1) : '';
-}
-
-function submitTurn(){
-  if(dartsThisTurn.length===0){ showMessage("Enter at least 1 dart"); return; }
-  let scoreEl = document.getElementById(currentPlayer+'-score');
-  if(currentPlayer==='home'){ homeScore=parseInt(scoreEl.textContent); currentPlayer='away'; } 
-  else{ awayScore=parseInt(scoreEl.textContent); currentPlayer='home'; }
-  dartsThisTurn=[];
-  updateActivePlayer();
-}
-
-function updateActivePlayer(){
-  document.getElementById('home').classList.remove('active');
-  document.getElementById('away').classList.remove('active');
-  document.getElementById(currentPlayer).classList.add('active');
-}
-
-function undoLastDart(){
-  if(dartsThisTurn.length>0){ dartsThisTurn.pop(); updateScoreboard(); }
-}
-
-function undoLastTurn(){
-  if(allDarts[currentPlayer].length>0){
-    for(let i=0;i<3;i++){ if(allDarts[currentPlayer].length>0) allDarts[currentPlayer].pop(); }
-    updateScoreboard();
+function updateDarts(){
+  for(let i=0;i<2;i++){
+    const dset=dartEls[i].querySelectorAll('.dart');
+    dset.forEach((d,j)=>{
+      d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';
+      d.classList.toggle('empty',currentDarts[i][j]===undefined);
+    });
   }
 }
 
-function showMessage(msg){
-  let el = document.getElementById('message');
-  el.textContent = msg;
-  el.style.display='block';
-  setTimeout(()=>{ el.style.display='none'; }, 1000);
+function switchPlayer(){
+  document.getElementById('home').classList.toggle('active');
+  document.getElementById('away').classList.toggle('active');
+  active=1-active;
 }
 
-function showStats(){
-  let overlay = document.getElementById('statsOverlay');
-  overlay.style.display='flex';
-  let text = '';
-  ['home','away'].forEach(p=>{
-    text += `${p.toUpperCase()} 3DA: ${calculate3DA(p)} | First9 Avg: --- | High Turn: --- <br>`;
-  });
-  document.getElementById('statsText').innerHTML = text;
+function addDart(value){
+  if(currentDarts[active].length>=3)return;
+  currentDarts[active].push(value);
+  updateDarts();
 }
 
-function closeStats(){
-  document.getElementById('statsOverlay').style.display='none';
+function calc3DA(i){
+  let thrown=allDarts[i]||[];
+  if(!thrown.length)return 0;
+  let total=thrown.reduce((a,b)=>a+b,0);
+  return (total/thrown.length*3).toFixed(2);
 }
+
+let allDarts=[[],[]];
+
+document.getElementById('keypad').addEventListener('click',e=>{
+  if(e.target.tagName!=='BUTTON')return;
+  const btn=e.target;
+  const act=btn.dataset.action;
+  if(act==='D'||act==='T'){multiplier=act;return;}
+  let val=0;
+  if(act==='25')val=25;
+  else if(act==='BULL')val=50;
+  else if(act==='NS')val=0;
+  else val=parseInt(btn.textContent);
+  if(multiplier==='D')val*=2;
+  if(multiplier==='T')val*=3;
+  multiplier=null;
+  addDart(val);
+});
+
+document.getElementById('undoDart').onclick=()=>{
+  currentDarts[active].pop();
+  updateDarts();
+};
+document.getElementById('undoTurn').onclick=()=>{
+  currentDarts[active]=[];
+  updateDarts();
+};
+document.getElementById('undoLast').onclick=()=>{
+  switchPlayer();
+  currentDarts[active]=[];
+  updateDarts();
+};
+
+document.getElementById('submitTurn').onclick=()=>{
+  const sum=currentDarts[active].reduce((a,b)=>a+b,0);
+  const newScore=scores[active]-sum;
+  if(newScore<0){showMessage('BUST!');currentDarts[active]=[];updateDarts();switchPlayer();return;}
+  scores[active]=newScore;
+  scoreEls[active].textContent=scores[active];
+  allDarts[active].push(...currentDarts[active]);
+  avgEls[active].textContent='3DA: '+calc3DA(active);
+  currentDarts[active]=[];
+  updateDarts();
+  if(newScore===0){showMessage('Game Shot!');}
+  switchPlayer();
+};
+
+document.getElementById('statsBtn').onclick=()=>{
+  document.getElementById('statsModal').style.display='flex';
+};
+document.getElementById('closeModal').onclick=()=>{
+  document.getElementById('statsModal').style.display='none';
+};
 </script>
 </body>
 </html>
