@@ -1,159 +1,96 @@
-:root {
-  --bg: #f5f9ff;
-  --fg: #003366;
-  --accent: #007bff;
-  --card: #ffffff;
-}
-body.dark {
-  --bg: #0d1117;
-  --fg: #e6edf3;
-  --accent: #58a6ff;
-  --card: #161b22;
-}
-
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--fg);
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
   margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+h1 {
   text-align: center;
-  transition: background 0.3s, color 0.3s;
+  margin-bottom: 2rem;
 }
 
-#startScreen, #gameScreen {
-  max-width: 480px;
-  margin: auto;
+#score-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.player-score {
+  width: 48%;
   padding: 1rem;
-}
-
-#gameScreen {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-
-.card {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 1rem;
-  margin: 1rem 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-input {
-  padding: 0.5rem;
-  width: 80%;
-  margin: 0.3rem 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 0.8rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
+  background-color: #222;
   color: #fff;
+  text-align: center;
+  font-size: 1.8rem;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+#input-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#input-section input {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+#input-section button {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-button:disabled {
-  opacity: 0.5;
-}
-
-#scoreboard {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
-
-.player {
-  flex: 1 1 45%;
-  margin: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-}
-
-.player.active {
-  background: rgba(0,123,255,0.1);
-}
-
-.score {
-  font-size: 2.2rem;
-  margin: 0.3rem 0;
-}
-
-.checkout {
-  font-size: 0.9rem;
-  color: var(--accent);
-  margin-bottom: 0.5rem;
-}
-
-.avg {
-  font-size: 0.9rem;
-  color: var(--accent);
-}
-
-#keypad {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.dart-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-}
-
-.dart {
-  width: 2.2rem;
-  height: 2.2rem;
-  line-height: 2.2rem;
-  border-radius: 5px;
-  background: var(--card);
-  border: 1px solid #ccc;
-}
-
 #controls {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.8rem;
+  margin-bottom: 1rem;
 }
 
-#darkToggle {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: var(--card);
-  color: var(--fg);
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8rem;
+#controls button {
+  flex: 1 1 45%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-#message {
-  font-weight: bold;
-  margin-top: 0.5rem;
-  display: none;
+#stats {
+  margin-top: 1rem;
+  font-size: 1.1rem;
 }
 
-#matchHistory {
-  display: none;
-  position: fixed;
-  top: 10%;
-  left: 10%;
-  right: 10%;
-  background: var(--card);
-  border: 2px solid var(--accent);
-  padding: 1rem;
-  z-index: 10;
-  border-radius: 10px;
-  max-height: 80%;
-  overflow-y: auto;
+.dark-mode {
+  background-color: #121212;
+  color: #eee;
+}
+
+.dark-mode .player-score {
+  background-color: #333;
+}
+
+.dark-mode #input-section button,
+.dark-mode #controls button {
+  background-color: #444;
 }
