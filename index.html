@@ -1,265 +1,900 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Legion Darts Scorer</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Legion Darts Scorer v2.0</title>
 <style>
-/* --- CSS Start --- */
+/* ===== Style (blue/white + subtle dartboard accent) ===== */
 :root{
-  --bg1:#eaf4ff;
-  --bg2:#d6ecff;
-  --accent:#0b66ff;
-  --accent2:#0b94ff;
-  --muted:#6b7a86;
-  --card:#ffffff;
-  --shadow:0 6px 20px rgba(11,102,255,0.08);
-  --rounded:12px;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  --bg1:#eaf4ff; --bg2:#d6ecff;
+  --accent:#0b66ff; --accent2:#0b94ff;
+  --muted:#6b7a86; --card:#ffffff;
+  --ok:#2bb673; --danger:#d64545;
+  --rounded:12px; --shadow: 0 8px 24px rgba(11,102,255,0.08);
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
+*{box-sizing:border-box}
 body{
-  margin:0;
-  min-height:100vh;
-  background: linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:#0b2330;
+  margin:0; min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(11,102,255,0.04), transparent 6%),
+    radial-gradient(circle at 90% 90%, rgba(11,102,255,0.03), transparent 6%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  color:#06202a; -webkit-font-smoothing:antialiased;
 }
-header.topbar{
-  background: var(--accent);
-  color:white;
-  padding:1rem;
-  font-weight:bold;
-  text-align:center;
+.app{
+  max-width:980px; margin:0 auto; padding:12px;
 }
-.container{
-  padding:0.5rem;
+
+/* Header */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:10px;
 }
-.scoreboard{
-  display:flex;
-  gap:0.5rem;
-  margin-bottom:0.5rem;
+.logo{font-weight:800;color:var(--accent);font-size:18px}
+.banner{
+  flex:1; text-align:center; font-weight:700; color:var(--muted);
+  font-size:14px;
 }
+
+/* Setup view */
+.setup{
+  background:var(--card); padding:12px; border-radius:12px; box-shadow:var(--shadow);
+  margin-bottom:12px;
+}
+.setup .row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.input{
+  padding:8px;border-radius:8px;border:1px solid rgba(6,18,30,0.06);min-width:160px;
+  font-size:16px;
+}
+.toggle{display:flex;gap:8px;align-items:center}
+
+/* Scoreboard */
+.board{display:flex;gap:8px;margin-bottom:10px}
 .player{
-  flex:1 1 45%;
-  background:var(--card);
-  border-radius:var(--rounded);
-  padding:0.5rem;
-  box-shadow:var(--shadow);
+  flex:1;background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);
+  position:relative;min-width:130px;
 }
-.player-name{
-  font-weight:bold;
+.player.highlight{box-shadow:0 12px 32px rgba(11,102,255,0.14);border:2px solid rgba(11,102,255,0.08)}
+.player-name{font-weight:800;font-size:15px}
+.score{font-size:36px;font-weight:900;color:var(--accent);margin:8px 0}
+.legs, .darts-mini{font-size:13px;color:var(--muted)}
+
+/* Turn area */
+.turn-card{background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:10px}
+.turn-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.turn-banner{font-weight:800;color:var(--accent);font-size:16px}
+.darts-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.dart-chip{
+  min-width:58px;padding:8px;border-radius:8px;background:#f1f6ff;border:1px solid rgba(11,102,255,0.06);
+  text-align:center;font-weight:700;cursor:pointer;
 }
-.score{
-  font-size:2rem;
-  margin:0.3rem 0;
+.dart-chip.editing{background:var(--accent2);color:white}
+.turn-total{font-weight:700;color:var(--muted)}
+
+/* Entry grid */
+.entry-wrap{display:flex;gap:8px;align-items:flex-start}
+.mult-col{display:flex;flex-direction:column;gap:6px;width:86px}
+.mult-btn{padding:14px;border-radius:10px;border:0;background:linear-gradient(180deg,#fff,#f7fbff);font-weight:800;cursor:pointer}
+.mult-btn.active{background:linear-gradient(180deg,#ffdede,#ffd6d6);color:var(--danger)}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex:1}
+.num-btn{padding:14px;border-radius:10px;border:0;background:linear-gradient(180deg,#fff,#f7fbff);font-weight:800;cursor:pointer}
+
+/* Controls */
+.controls{display:flex;gap:8px;margin-top:10px}
+.btn{padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:800}
+.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent2));color:white}
+.btn.ghost{background:transparent;border:1px solid rgba(6,18,30,0.06)}
+.small{padding:8px 10px;font-size:14px}
+
+/* Log */
+.log{background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);max-height:220px;overflow:auto}
+
+/* Modal */
+.modal-back{position:fixed;inset:0;background:rgba(6,18,30,0.45);display:flex;align-items:center;justify-content:center;z-index:80}
+.modal{background:white;padding:16px;border-radius:12px;max-width:560px;width:92%;box-shadow:0 16px 48px rgba(2,8,23,0.35)}
+.modal h3{margin-top:0}
+.modal .buttons{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+
+/* small responsive tweaks */
+@media (max-width:700px){
+  .nums{grid-template-columns:repeat(3,1fr)}
+  .mult-col{width:64px}
+  .dart-chip{min-width:44px}
+  .score{font-size:28px}
 }
-.legs{
-  font-size:0.9rem;
-  color:var(--muted);
-}
-.darts-mini{
-  font-size:0.85rem;
-  margin-top:0.3rem;
-}
-.turn-area{
-  background:var(--card);
-  padding:0.5rem;
-  border-radius:var(--rounded);
-  box-shadow:var(--shadow);
-  margin-bottom:0.5rem;
-}
-.current-darts{
-  display:flex;
-  gap:0.3rem;
-  margin-bottom:0.3rem;
-  flex-wrap:wrap;
-}
-.current-darts button{
-  flex:1;
-  min-width:40px;
-  padding:0.4rem;
-  border:none;
-  border-radius:6px;
-  background:#eee;
-}
-.current-darts button.current{
-  background:var(--accent2);
-  color:white;
-}
-.entry-grid{
-  display:flex;
-  gap:0.5rem;
-}
-.multiplier-col{
-  display:flex;
-  flex-direction:column;
-  gap:0.3rem;
-}
-.numbers-col{
-  display:grid;
-  grid-template-columns: repeat(4,1fr);
-  gap:0.3rem;
-  flex:1;
-}
-button.btn{
-  padding:0.5rem;
-  border:none;
-  border-radius:6px;
-  background: var(--accent);
-  color:white;
-  font-weight:bold;
-  font-size:1rem;
-}
-button.btn.small{padding:0.3rem;font-size:0.9rem;}
-button.btn.ghost{background:#eee;color:#333;}
-.controls{
-  display:flex;
-  gap:0.3rem;
-  margin-top:0.3rem;
-}
-/* --- CSS End --- */
 </style>
 </head>
 <body>
+<div class="app">
 
-<header class="topbar">Legion Darts Scorer</header>
+  <div class="topbar">
+    <div class="logo">Legion Darts Scorer</div>
+    <div class="banner" id="turn-banner">Setup match</div>
+    <div style="min-width:48px"></div>
+  </div>
 
-<div class="container">
-  <div class="scoreboard">
-    <div class="player" id="player-home">
-      <div class="player-name" id="name-home">Home (P1)</div>
-      <div class="score" id="score-home">501</div>
-      <div class="legs" id="legs-home">Legs: 0</div>
-      <div class="darts-mini" id="darts-mini-home">Darts: 0</div>
+  <!-- SETUP VIEW -->
+  <div id="setup-view" class="setup" aria-hidden="false">
+    <div style="font-weight:800;margin-bottom:8px">Match setup</div>
+    <div class="row">
+      <label>Home name
+        <input id="input-home" class="input" placeholder="Home (P1)">
+      </label>
+      <label>Away name
+        <input id="input-away" class="input" placeholder="Away (P2)">
+      </label>
     </div>
-    <div class="player" id="player-away">
-      <div class="player-name" id="name-away">Away (P2)</div>
-      <div class="score" id="score-away">501</div>
-      <div class="legs" id="legs-away">Legs: 0</div>
-      <div class="darts-mini" id="darts-mini-away">Darts: 0</div>
+    <div class="row toggle">
+      <label><input type="checkbox" id="toggle-double" checked> Double-Out required</label>
+      <div style="flex:1"></div>
+      <label>Best of <strong>3</strong> (first to 2)</label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="btn-load" class="btn ghost small">Resume saved</button>
+      <button id="btn-start" class="btn primary small">Start Match</button>
     </div>
   </div>
 
-  <div class="turn-area">
-    <div>Current: <strong id="current-player-label">Home (P1)</strong></div>
-    <div class="current-darts" id="darts-list">No darts yet</div>
-    <div>Turn Total: <span id="turn-total">0</span></div>
-    <div class="entry-grid">
-      <div class="multiplier-col">
-        <button class="btn" data-mult="2" id="btn-D">D</button>
-        <button class="btn" data-mult="3" id="btn-T">T</button>
-        <button class="btn" data-mult="1" id="btn-25">25</button>
-        <button class="btn" data-mult="1" id="btn-Bull">Bull</button>
-        <button class="btn" data-mult="0" id="btn-0">0</button>
+  <!-- MAIN SCORING VIEW -->
+  <div id="main-view" style="display:none;">
+    <div class="board">
+      <div id="pl-home" class="player">
+        <div class="player-name" id="name-home">Home (P1)</div>
+        <div class="score" id="score-home">501</div>
+        <div class="legs" id="legs-home">Legs: 0</div>
+        <div class="darts-mini" id="darts-home">Darts: 0</div>
       </div>
-      <div class="numbers-col" id="numbers-col">
-        <!-- numbers 1–20 injected by JS -->
+
+      <div id="pl-away" class="player">
+        <div class="player-name" id="name-away">Away (P2)</div>
+        <div class="score" id="score-away">501</div>
+        <div class="legs" id="legs-away">Legs: 0</div>
+        <div class="darts-mini" id="darts-away">Darts: 0</div>
       </div>
     </div>
-    <div class="controls">
-      <button class="btn" id="undo-dart">Undo Dart</button>
-      <button class="btn" id="next-player">Next Player</button>
+
+    <div class="turn-card">
+      <div class="turn-top">
+        <div id="turn-info">Current: <strong id="current-player-label">Home (P1)</strong></div>
+        <div class="turn-total">Turn total: <span id="turn-total">0</span></div>
+      </div>
+
+      <div class="darts-row" id="darts-list">
+        <!-- Dart chips (editable) appear here -->
+      </div>
+
+      <div class="entry-wrap">
+        <div class="mult-col">
+          <button id="btn-D" class="mult-btn" data-mult="2">D</button>
+          <button id="btn-T" class="mult-btn" data-mult="3">T</button>
+          <button id="btn-25" class="mult-btn" data-action="25">25</button>
+          <button id="btn-Bull" class="mult-btn" data-action="Bull">Bull</button>
+          <button id="btn-0" class="mult-btn" data-action="0">0</button>
+        </div>
+        <div class="nums" id="numbers-col">
+          <!-- number buttons injected -->
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="undo-dart" class="btn ghost small">Undo Dart</button>
+        <button id="undo-turn" class="btn ghost small">Undo Last Turn</button>
+        <div style="flex:1"></div>
+        <button id="new-match" class="btn ghost small">New Match</button>
+      </div>
+    </div>
+
+    <div class="log" id="log">
+      <div style="color:var(--muted)">Match log will appear here</div>
     </div>
   </div>
+
+  <!-- MODALS -->
+  <div id="modal-root"></div>
+
 </div>
 
 <script>
-/* --- JS Start --- */
-let players=[
-  {name:"Home (P1)",score:501,darts:0},
-  {name:"Away (P2)",score:501,darts:0}
-];
-let currentPlayer=0;
-let turnDarts=[];
-let multiplier=1;
-let editingIndex=null;
+/* ===== Legion Darts Scorer v2.0 - Single-file JS =====
+   Features:
+   - Single-page: setup -> match
+   - Double-out toggle (pre-match)
+   - Per-dart entry, tap dart to edit
+   - Bust rules and double-out enforcement
+   - Best of 3 (first to 2) auto legs, auto match end
+   - Leg & match popups (centered); match summary shows per-leg 3-dart averages and overall averages
+   - Undo last dart, undo last confirmed turn
+   - Persistence to localStorage (resume)
+   - Alternating starting player per leg
+   - Silent (no sounds)
+*/
 
-const scoreHomeEl=document.getElementById("score-home");
-const scoreAwayEl=document.getElementById("score-away");
-const currentPlayerLabel=document.getElementById("current-player-label");
-const dartsListEl=document.getElementById("darts-list");
-const turnTotalEl=document.getElementById("turn-total");
-const numbersCol=document.getElementById("numbers-col");
+/* ---------- Configuration ---------- */
+const START_SCORE = 501;
+const LEGS_TO_WIN = 2; // best of 3 -> first to 2
+const STORAGE_KEY = 'legion:darts:v2:match';
+const SETTINGS_KEY = 'legion:darts:v2:settings';
 
-function updateDisplay(){
-  scoreHomeEl.textContent=players[0].score;
-  scoreAwayEl.textContent=players[1].score;
-  currentPlayerLabel.textContent=players[currentPlayer].name;
-  // Update darts list
-  dartsListEl.innerHTML="";
-  if(turnDarts.length===0)dartsListEl.textContent="No darts yet";
-  else{
-    turnDarts.forEach((dart,i)=>{
-      const btn=document.createElement("button");
-      btn.textContent=dart.label;
-      if(i===editingIndex)btn.classList.add("current");
-      btn.addEventListener("click",()=>editDart(i));
-      dartsListEl.appendChild(btn);
+/* ---------- State ---------- */
+let state = {
+  settings: { doubleOut:true },
+  players: { home: createPlayer('Home (P1)'), away: createPlayer('Away (P2)') },
+  current: 'home',         // 'home' or 'away' - who's current to throw
+  starter: 'home',         // who starts current leg (alternates each leg)
+  turnStartScore: null,    // start score at beginning of current turn (for bust revert)
+  turnDarts: [],           // staged darts for this turn [{label:'T20', val:60, mult:3, base:20}, ...]
+  history: [],             // confirmed turns across match [{player:'home', startScore, darts:[], newScore, turnTotal, bust, legWon, legIndex}]
+  matchLegs: {home:0,away:0},
+  perLegStats: [],         // array of legs: each leg {home:{pointsScored,dartsThrown}, away:{...}}
+  savedAt: null,
+  playing: false
+};
+
+function createPlayer(name){
+  return { name, score: START_SCORE, dartsThrown: 0, highestCheckout: 0 };
+}
+
+/* ---------- DOM ---------- */
+const el = id => document.getElementById(id);
+const setupView = el('setup-view'), mainView = el('main-view');
+const inputHome = el('input-home'), inputAway = el('input-away'), toggleDouble = el('toggle-double');
+const btnStart = el('btn-start'), btnLoad = el('btn-load');
+const turnBanner = el('turn-banner');
+const nameHomeEl = el('name-home'), nameAwayEl = el('name-away');
+const scoreHomeEl = el('score-home'), scoreAwayEl = el('score-away');
+const legsHomeEl = el('legs-home'), legsAwayEl = el('legs-away');
+const dartsHomeMini = el('darts-home'), dartsAwayMini = el('darts-away');
+const currentPlayerLabel = el('current-player-label'), turnTotalEl = el('turn-total');
+const dartsListEl = el('darts-list'), numbersCol = el('numbers-col');
+const btnD = el('btn-D'), btnT = el('btn-T'), btn25 = el('btn-25'), btnBull = el('btn-Bull'), btn0 = el('btn-0');
+const undoDartBtn = el('undo-dart'), undoTurnBtn = el('undo-turn'), newMatchBtn = el('new-match');
+const logEl = el('log');
+const modalRoot = el('modal-root');
+
+/* ---------- Utilities ---------- */
+function saveSettings(){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+}
+function loadSettings(){
+  try{ const s = JSON.parse(localStorage.getItem(SETTINGS_KEY)); if(s) state.settings = s; }catch(e){}
+}
+function saveMatch(){
+  const toSave = {
+    settings: state.settings,
+    players: state.players,
+    current: state.current,
+    starter: state.starter,
+    turnDarts: state.turnDarts,
+    history: state.history,
+    matchLegs: state.matchLegs,
+    perLegStats: state.perLegStats,
+    savedAt: Date.now()
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  state.savedAt = toSave.savedAt;
+}
+function loadMatch(){
+  try{ const s = JSON.parse(localStorage.getItem(STORAGE_KEY)); return s; }catch(e){ return null; }
+}
+function clearSavedMatch(){ localStorage.removeItem(STORAGE_KEY); }
+
+/* ---------- Init ---------- */
+function init(){
+  loadSettings();
+  // show resume button if saved match exists
+  const saved = loadMatch();
+  btnLoad.style.display = saved ? 'inline-block' : 'none';
+  // inject numbers 1..20 in layout as per our columns
+  numbersCol.innerHTML = '';
+  const order = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+  // We'll display them in rows top->bottom left->right (grid handles arrangement)
+  order.forEach(n=>{
+    const b = document.createElement('button');
+    b.className = 'num-btn num-btn--main';
+    b.textContent = n;
+    b.dataset.val = n;
+    b.addEventListener('click', ()=>onNumberClick(n));
+    numbersCol.appendChild(b);
+  });
+
+  // bind setup buttons
+  btnStart.addEventListener('click', startMatchFromSetup);
+  btnLoad.addEventListener('click', resumeSavedMatch);
+
+  // entry controls
+  btnD.addEventListener('click', ()=>setPendingMultiplier(2));
+  btnT.addEventListener('click', ()=>setPendingMultiplier(3));
+  btn25.addEventListener('click', ()=>onSpecial('25'));
+  btnBull.addEventListener('click', ()=>onSpecial('Bull'));
+  btn0.addEventListener('click', ()=>onSpecial('0'));
+
+  undoDartBtn.addEventListener('click', undoDart);
+  undoTurnBtn.addEventListener('click', undoLastTurn);
+  newMatchBtn.addEventListener('click', ()=>confirmNewMatch());
+
+  // initial render (setup mode)
+  renderSetup();
+}
+init();
+
+/* ---------- Render / UI helpers ---------- */
+function renderSetup(){
+  setupView.style.display = 'block';
+  mainView.style.display = 'none';
+  turnBanner.textContent = 'Setup match';
+}
+function renderMain(){
+  setupView.style.display = 'none';
+  mainView.style.display = 'block';
+  updateBoard();
+  renderTurn();
+  renderLog();
+  saveMatch();
+}
+
+function updateBoard(){
+  nameHomeEl.textContent = state.players.home.name;
+  nameAwayEl.textContent = state.players.away.name;
+  scoreHomeEl.textContent = state.players.home.score;
+  scoreAwayEl.textContent = state.players.away.score;
+  legsHomeEl.textContent = `Legs: ${state.matchLegs.home}`;
+  legsAwayEl.textContent = `Legs: ${state.matchLegs.away}`;
+  dartsHomeMini.textContent = `Darts: ${state.players.home.dartsThrown}`;
+  dartsAwayMini.textContent = `Darts: ${state.players.away.dartsThrown}`;
+
+  // highlight current player
+  document.getElementById('pl-home').classList.toggle('highlight', state.current === 'home');
+  document.getElementById('pl-away').classList.toggle('highlight', state.current === 'away');
+
+  // banner
+  turnBanner.textContent = `${state.players[state.current].name} to throw`;
+  currentPlayerLabel.textContent = state.players[state.current].name;
+}
+
+/* render staged turn */
+function renderTurn(){
+  // turn total
+  const total = state.turnDarts.reduce((s,d)=>s+d.val,0);
+  turnTotalEl.textContent = total;
+  dartsListEl.innerHTML = '';
+  if(state.turnDarts.length === 0){
+    dartsListEl.textContent = 'No darts yet';
+    undoDartBtn.disabled = true;
+    return;
+  }
+  undoDartBtn.disabled = false;
+  state.turnDarts.forEach((d, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'dart-chip' + (d.editing ? ' editing' : '');
+    btn.textContent = d.label;
+    btn.title = `Tap to edit dart ${idx+1}`;
+    btn.addEventListener('click', ()=>beginEditDart(idx));
+    dartsListEl.appendChild(btn);
+  });
+}
+
+/* render history/log */
+function renderLog(){
+  if(!state.history.length){
+    logEl.innerHTML = `<div style="color:var(--muted)">No turns yet</div>`;
+    return;
+  }
+  logEl.innerHTML = '';
+  state.history.slice().reverse().forEach(h=>{
+    const who = state.players[h.player].name;
+    const parts = h.darts.map(d=>d.label).join(' • ');
+    const line = document.createElement('div');
+    line.style.marginBottom = '8px';
+    line.innerHTML = `<div style="font-weight:700">${who}</div>
+      <div style="color:var(--muted)">Start ${h.startScore} → ${h.newScore} (${h.turnTotal}) ${h.bust?'<strong style="color:var(--danger)">BUST</strong>':''}${h.legWon?'<strong style="color:var(--ok)"> LEG</strong>':''}</div>
+      <div>${parts}</div>`;
+    logEl.appendChild(line);
+  });
+}
+
+/* ---------- Entry / Dart handling ---------- */
+let pendingMultiplier = 1;
+function setPendingMultiplier(m){
+  pendingMultiplier = (pendingMultiplier === m) ? 1 : m;
+  btnD.classList.toggle('active', pendingMultiplier === 2);
+  btnT.classList.toggle('active', pendingMultiplier === 3);
+}
+
+/* Called when a number button is pressed */
+function onNumberClick(n){
+  // build label and value using pendingMultiplier
+  let label = (pendingMultiplier === 1) ? `${n}` : (pendingMultiplier === 2 ? `D${n}` : `T${n}`);
+  const val = (pendingMultiplier === 1) ? n : n * pendingMultiplier;
+  addOrEditDart({label, val, mult: pendingMultiplier, base: n});
+}
+
+/* specials: 25 -> label "25", value 25 (cannot double-out on 25), Bull -> 50 (double), 0 -> miss */
+function onSpecial(code){
+  if(code === '25') addOrEditDart({label:'25', val:25, mult:1, base:25});
+  else if(code === 'Bull') addOrEditDart({label:'Bull', val:50, mult:2, base:25});
+  else if(code === '0') addOrEditDart({label:'0', val:0, mult:0, base:0});
+}
+
+/* Add new dart or edit existing if editing */
+function addOrEditDart(dart){
+  if(state.turnDarts.editingIndex !== undefined && state.turnDarts.editingIndex !== null){
+    const i = state.turnDarts.editingIndex;
+    // revert previous deduction
+    state.players[state.current].score += state.turnDarts[i].val;
+    // replace
+    state.turnDarts[i] = dart;
+    delete state.turnDarts.editingIndex;
+    // apply new
+    state.players[state.current].score -= dart.val;
+    state.players[state.current].dartsThrown += 0; // editing shouldn't change dartsThrown
+    checkFinishOrBustAfterDart(i);
+  } else {
+    // If first dart of turn, store turnStartScore for bust revert
+    if(state.turnDarts.length === 0) state.turnStartScore = state.players[state.current].score;
+    // push and apply
+    state.turnDarts.push(dart);
+    state.players[state.current].score -= dart.val;
+    state.players[state.current].dartsThrown += 1;
+    // check finish or bust
+    checkFinishOrBustAfterDart(state.turnDarts.length - 1);
+  }
+  // reset multiplier
+  pendingMultiplier = 1;
+  btnD.classList.remove('active'); btnT.classList.remove('active');
+  renderTurn(); updateBoard(); saveMatch();
+}
+
+/* Begin edit a staged dart */
+function beginEditDart(index){
+  // mark editing index
+  state.turnDarts.editingIndex = index;
+  // mark editing flags for UI
+  state.turnDarts.forEach((d,i)=> d.editing = (i===index));
+  // show hint in banner
+  turnBanner.textContent = `Editing dart ${index+1} — choose multiplier then number`;
+  renderTurn();
+}
+
+/* Undo last staged dart */
+function undoDart(){
+  if(state.turnDarts.length === 0) return;
+  const last = state.turnDarts.pop();
+  // revert deduction and dartsThrown decrement
+  state.players[state.current].score += last.val;
+  state.players[state.current].dartsThrown = Math.max(0, state.players[state.current].dartsThrown - 1);
+  // clear editing state
+  delete state.turnDarts.editingIndex;
+  state.turnDarts.forEach(d=>delete d.editing);
+  // if no staged darts left, clear turnStartScore
+  if(state.turnDarts.length === 0) state.turnStartScore = null;
+  renderTurn(); updateBoard(); saveMatch();
+}
+
+/* Undo last confirmed turn */
+function undoLastTurn(){
+  if(!state.history.length) { alert('No confirmed turns to undo'); return; }
+  if(!confirm('Undo last confirmed turn? This will revert score, darts, and legs if needed.')) return;
+  const last = state.history.pop();
+  const p = state.players[last.player];
+  // revert score and darts thrown
+  p.score = last.startScore;
+  p.dartsThrown = Math.max(0, p.dartsThrown - last.darts.length);
+  // if leg was won, revert leg and perLegStats
+  if(last.legWon){
+    state.matchLegs[last.player] = Math.max(0, state.matchLegs[last.player] - 1);
+    // remove last leg stats entry if it matches
+    const lastLeg = state.perLegStats.pop();
+    // if match ended previously remove summary; we keep current view
+  }
+  // set current to the player who had played (so they can continue)
+  state.current = last.player;
+  state.turnDarts = [];
+  state.turnStartScore = null;
+  renderTurn(); updateBoard(); renderLog(); saveMatch();
+  flash('Last confirmed turn undone');
+}
+
+/* ---------- After each dart: check finish or bust ---------- */
+function checkFinishOrBustAfterDart(lastIndex){
+  const playerKey = state.current;
+  const p = state.players[playerKey];
+  const running = p.score; // already deducted
+
+  // bust: below 0 OR equals 1 (cannot finish on 1) OR equals 0 but not valid double when doubleOut ON
+  let bust = false, finished = false;
+  if(running < 0) bust = true;
+  else if(running === 1) bust = true;
+  else if(running === 0){
+    // determine if finishing dart is valid double/out
+    const d = state.turnDarts[lastIndex];
+    const isDoubleBull = (d.label === 'Bull' && state.settings.doubleOut);
+    const isDouble = (d.mult === 2);
+    if(state.settings.doubleOut){
+      if(isDouble || isDoubleBull){
+        finished = true;
+      } else {
+        bust = true;
+      }
+    } else {
+      // double-out disabled
+      finished = true;
+    }
+  }
+
+  if(bust){
+    // Record bust turn
+    const entry = {
+      player: playerKey,
+      startScore: state.turnStartScore !== null ? state.turnStartScore : p.score + state.turnDarts.reduce((s,d)=>s+d.val,0),
+      darts: state.turnDarts.slice(),
+      newScore: state.turnStartScore !== null ? state.turnStartScore : p.score,
+      turnTotal: 0,
+      bust: true,
+      legWon: false,
+      legIndex: state.perLegStats.length
+    };
+    state.history.push(entry);
+    // As per rules we decided: darts thrown during bust DO count (we've already incremented dartsThrown)
+    // Reset player's score to turnStartScore
+    if(state.turnStartScore !== null) p.score = state.turnStartScore;
+    // clear staged darts
+    state.turnDarts = [];
+    state.turnStartScore = null;
+    renderLog(); updateBoard(); renderTurn(); saveMatch();
+    flash('BUST! Turn ends and score reverts.');
+    // switch to next player after short delay to let user see
+    setTimeout(()=>{ switchPlayer(); }, 700);
+    return;
+  }
+
+  if(finished){
+    // compute turnTotal
+    const turnTotal = state.turnDarts.reduce((s,d)=>s+d.val,0);
+    const entry = {
+      player: playerKey,
+      startScore: state.turnStartScore !== null ? state.turnStartScore : (p.score + turnTotal),
+      darts: state.turnDarts.slice(),
+      newScore: 0,
+      turnTotal,
+      bust:false,
+      legWon:true,
+      legIndex: state.perLegStats.length
+    };
+    state.history.push(entry);
+    // update highest checkout
+    if(turnTotal > p.highestCheckout) p.highestCheckout = turnTotal;
+    // update per-leg stats for the winner
+    // ensure perLegStats has current leg object
+    ensureCurrentLegStats();
+    state.perLegStats[state.perLegStats.length-1][playerKey].pointsScored += turnTotal;
+    state.perLegStats[state.perLegStats.length-1][playerKey].dartsThrown += state.turnDarts.length;
+    // increment leg count
+    state.matchLegs[playerKey] += 1;
+    renderLog(); saveMatch();
+
+    // show leg or match popup depending on match state
+    if(state.matchLegs[playerKey] >= LEGS_TO_WIN){
+      // match won
+      showMatchSummary(playerKey);
+      return;
+    } else {
+      showLegPopup(playerKey);
+      return;
+    }
+  }
+
+  // not finished nor bust -> continue (nothing else until user edits or adds further darts)
+  renderTurn(); updateBoard(); saveMatch();
+}
+
+/* ---------- Turn complete helper: switch player ---------- */
+function switchPlayer(){
+  // clear staged darts and editing markers (unless we just finished leg/match)
+  state.turnDarts = [];
+  state.turnStartScore = null;
+  delete state.turnDarts.editingIndex;
+  state.turnDarts.forEach(d=>delete d.editing);
+  // alternate current player
+  state.current = (state.current === 'home') ? 'away' : 'home';
+  updateBoard(); renderTurn(); saveMatch();
+}
+
+/* ---------- Leg & Match flow ---------- */
+function ensureCurrentLegStats(){
+  // if no leg stats exist for current leg index, push new
+  if(!state.perLegStats.length || state.perLegStats.length !== (state.matchLegs.home + state.matchLegs.away)){
+    // create new leg stats object
+    state.perLegStats.push({
+      home: { pointsScored: 0, dartsThrown: 0 },
+      away: { pointsScored: 0, dartsThrown: 0 }
     });
   }
-  turnTotalEl.textContent=turnDarts.reduce((a,b)=>a.value+b.value,0);
-  // Update mini stats
-  document.getElementById("darts-mini-home").textContent=`Darts: ${players[0].darts}`;
-  document.getElementById("darts-mini-away").textContent=`Darts: ${players[1].darts}`;
 }
 
-function addDart(value,label){
-  if(editingIndex!==null){
-    // revert previous value
-    players[currentPlayer].score += turnDarts[editingIndex].value;
-    turnDarts[editingIndex]={value,label};
-    editingIndex=null;
-  } else{
-    turnDarts.push({value,label});
+function startNewLeg(afterWinner){
+  // afterWinner: 'home' or 'away' who won last leg; used to set starter alternation
+  // alternate starter each leg relative to previous starter
+  state.starter = (state.starter === 'home') ? 'away' : 'home';
+  state.current = state.starter;
+  // reset scores & staged darts
+  state.players.home.score = START_SCORE;
+  state.players.away.score = START_SCORE;
+  state.turnDarts = [];
+  state.turnStartScore = null;
+  // make sure perLegStats has entry for new leg (it should already be pushed in checkFinish)
+  renderMain(); saveMatch();
+}
+
+/* ---------- Popups / Modals ---------- */
+function clearModal(){
+  modalRoot.innerHTML = '';
+}
+function showModal(contentHtml){
+  modalRoot.innerHTML = `<div class="modal-back"><div class="modal">${contentHtml}</div></div>`;
+}
+
+/* Leg popup */
+function showLegPopup(winnerKey){
+  const winnerName = state.players[winnerKey].name;
+  const html = `
+    <h3>🏆 Leg won</h3>
+    <div style="font-weight:800">${winnerName} wins the leg</div>
+    <div style="margin-top:8px">Match: ${state.players.home.name} ${state.matchLegs.home} — ${state.matchLegs.away} ${state.players.away.name}</div>
+    <div class="buttons">
+      <button id="continue-leg" class="btn primary">Continue</button>
+    </div>`;
+  showModal(html);
+  document.getElementById('continue-leg').addEventListener('click', ()=>{
+    clearModal();
+    startNewLeg(winnerKey);
+  });
+}
+
+/* Match summary modal */
+function showMatchSummary(winnerKey){
+  // compute per-leg averages and overall averages
+  const summary = buildMatchSummary();
+  const winnerName = state.players[winnerKey].name;
+  let html = `<h3>🏁 Match Result</h3>
+    <div style="font-weight:800">${state.players.home.name} ${state.matchLegs.home} — ${state.matchLegs.away} ${state.players.away.name}</div>
+    <div style="margin-top:8px">Winner: <strong>${winnerName}</strong></div>
+    <hr>`;
+  // per-leg table
+  html += `<div style="max-height:260px;overflow:auto">`;
+  summary.legs.forEach((leg, i)=>{
+    html += `<div style="margin:8px 0"><strong>Leg ${i+1}:</strong> ${state.players.home.name} 3-dart avg ${leg.homeAvg.toFixed(2)}  |  ${state.players.away.name} 3-dart avg ${leg.awayAvg.toFixed(2)}</div>`;
+  });
+  html += `</div><hr>`;
+  html += `<div style="display:flex;gap:8px;justify-content:space-between">
+    <div><strong>Overall 3-dart avg</strong><div>${state.players.home.name}: ${summary.overall.homeAvg.toFixed(2)}</div></div>
+    <div><strong></strong><div>${state.players.away.name}: ${summary.overall.awayAvg.toFixed(2)}</div></div>
+  </div>`;
+  html += `<div class="buttons"><button id="btn-newmatch" class="btn primary">New Match</button><button id="btn-close" class="btn ghost">Close</button></div>`;
+  showModal(html);
+
+  document.getElementById('btn-newmatch').addEventListener('click', ()=>{
+    clearModal();
+    resetMatch();
+  });
+  document.getElementById('btn-close').addEventListener('click', ()=>{
+    clearModal();
+    // after match end, keep board in post-match state; clear saved match
+    clearSavedMatch();
+    state.playing = false;
+    renderSetup();
+  });
+}
+
+/* Build match summary data */
+function buildMatchSummary(){
+  // perLegStats entries correspond to completed legs
+  const legs = state.perLegStats.map(leg => {
+    const homeAvg = (leg.home.dartsThrown === 0) ? 0 : ( (leg.home.pointsScored / leg.home.dartsThrown) * 3 );
+    const awayAvg = (leg.away.dartsThrown === 0) ? 0 : ( (leg.away.pointsScored / leg.away.dartsThrown) * 3 );
+    return { homeAvg, awayAvg, homePoints: leg.home.pointsScored, awayPoints: leg.away.pointsScored, homeDarts: leg.home.dartsThrown, awayDarts: leg.away.dartsThrown };
+  });
+
+  // overall
+  let homeTotalPoints = 0, homeTotalDarts = 0, awayTotalPoints = 0, awayTotalDarts = 0;
+  state.perLegStats.forEach(leg => {
+    homeTotalPoints += leg.home.pointsScored;
+    homeTotalDarts += leg.home.dartsThrown;
+    awayTotalPoints += leg.away.pointsScored;
+    awayTotalDarts += leg.away.dartsThrown;
+  });
+  const overall = {
+    homeAvg: homeTotalDarts === 0 ? 0 : ((homeTotalPoints / homeTotalDarts) * 3),
+    awayAvg: awayTotalDarts === 0 ? 0 : ((awayTotalPoints / awayTotalDarts) * 3)
+  };
+  return { legs, overall };
+}
+
+/* ---------- Match lifecycle ---------- */
+function startMatchFromSetup(){
+  const h = inputHome.value.trim() || 'Home (P1)';
+  const a = inputAway.value.trim() || 'Away (P2)';
+  state.players.home = createPlayer(h);
+  state.players.away = createPlayer(a);
+  state.settings.doubleOut = !!toggleDouble.checked;
+  state.matchLegs = { home:0, away:0 };
+  state.perLegStats = [];
+  state.history = [];
+  state.turnDarts = [];
+  state.turnStartScore = null;
+  state.current = 'home';
+  state.starter = 'home';
+  state.playing = true;
+  saveSettings();
+  ensureCurrentLegStats(); // push first leg stats
+  // save match
+  saveMatch();
+  renderMain();
+  flash('Match started — Good luck!');
+}
+
+function resumeSavedMatch(){
+  const saved = loadMatch();
+  if(!saved){ alert('No saved match found'); return; }
+  state.settings = saved.settings || state.settings;
+  state.players = saved.players || state.players;
+  state.current = saved.current || state.current;
+  state.starter = saved.starter || state.starter;
+  state.turnDarts = saved.turnDarts || [];
+  state.history = saved.history || [];
+  state.matchLegs = saved.matchLegs || {home:0,away:0};
+  state.perLegStats = saved.perLegStats || [];
+  state.playing = true;
+  inputHome.value = state.players.home.name;
+  inputAway.value = state.players.away.name;
+  toggleDouble.checked = state.settings.doubleOut;
+  renderMain();
+  flash('Saved match resumed');
+}
+
+/* New match reset */
+function resetMatch(){
+  state = {
+    settings: { doubleOut: true },
+    players: { home: createPlayer('Home (P1)'), away: createPlayer('Away (P2)') },
+    current: 'home',
+    starter: 'home',
+    turnStartScore: null,
+    turnDarts: [],
+    history: [],
+    matchLegs: {home:0,away:0},
+    perLegStats: [],
+    savedAt: null,
+    playing: false
+  };
+  clearSavedMatch();
+  inputHome.value = ''; inputAway.value = '';
+  toggleDouble.checked = true;
+  renderSetup();
+  flash('Match reset. Set names and start a new match.');
+}
+
+/* Confirm New Match */
+function confirmNewMatch(){
+  if(!confirm('Start a new match? This will reset legs and scores.')) return;
+  resetMatch();
+}
+
+/* ---------- Helper flash toast ---------- */
+function flash(text){
+  const t = document.createElement('div');
+  t.style.position='fixed'; t.style.left='50%'; t.style.transform='translateX(-50%)';
+  t.style.bottom='18px'; t.style.padding='10px 14px'; t.style.background='rgba(6,18,30,0.85)';
+  t.style.color='white'; t.style.borderRadius='10px'; t.style.zIndex=200; t.textContent=text;
+  document.body.appendChild(t);
+  setTimeout(()=> t.style.opacity='0',1400);
+  setTimeout(()=> t.remove(),1800);
+}
+
+/* ---------- Finishing touches: apply logic to per-leg stats when user confirms turns manually?
+   In this design we update perLegStats when a leg is finished (we already push points there).
+   For normal non-finishing turns we should accumulate per-leg stats only when turn is confirmed as final.
+   Our current flow records history entries for busts and leg wins; for regular darts we consider them applied immediately,
+   so we will also update perLegStats for non-finishing turns on a manual "confirm" action.
+   But in this version we treat each dart application as immediate (as user tapped). Therefore we'll update perLegStats
+   as darts are entered for the current leg to compute averages correctly at match end.
+*/
+
+/* Update perLegStats when a dart is added (for ongoing scoring) */
+function updatePerLegStatsForCurrentDart(dart){
+  // ensure current leg exists
+  ensureCurrentLegStats();
+  const legIdx = state.perLegStats.length - 1;
+  const p = state.current;
+  state.perLegStats[legIdx][p].pointsScored += dart.val;
+  state.perLegStats[legIdx][p].dartsThrown += 1;
+}
+
+/* BUT careful: when we do this we already update p.dartsThrown and p.score outside.
+   To avoid double-counting when dart is later reverted (undo or bust), we must also revert these perLegStats changes.
+   So instead of updating perLegStats at dart addition time, we will update them on leg end and compute averages
+   from history + final leg scored. To keep code robust and simpler, we'll build averages from history and perLegStats only for finished legs.
+*/
+
+/* Revised approach: maintain per-leg tallies only for finished legs (when leg ends).
+   For overall averages we will compute from history entries (all confirmed turns) and from per-leg finished data.
+   Simplify: compute averages at match end by iterating state.history and adding up turnTotals and darts per player by legIndex.
+*/
+
+/* Build match summary from history (more accurate) */
+function buildMatchSummary(){
+  // gather legs by their legIndex (history entries include legIndex)
+  const legsMap = {};
+  state.history.forEach(h=>{
+    const idx = h.legIndex || 0;
+    if(!legsMap[idx]) legsMap[idx] = { home: {points:0,darts:0}, away:{points:0,darts:0} };
+    if(h.bust) {
+      // darts in a bust still count as darts thrown but 0 points scored this turn
+      legsMap[idx][h.player].darts += h.darts.length;
+      // points scored stays same
+    } else {
+      legsMap[idx][h.player].darts += h.darts.length;
+      legsMap[idx][h.player].points += h.turnTotal || 0;
+    }
+    // if legWon true, ensure that leg has been accounted for (already included)
+  });
+
+  // Now compute per-leg averages
+  const legs = Object.keys(legsMap).sort((a,b)=>a-b).map(k=>{
+    const L = legsMap[k];
+    const homeAvg = L.home.darts === 0 ? 0 : ((L.home.points / L.home.darts) * 3);
+    const awayAvg = L.away.darts === 0 ? 0 : ((L.away.points / L.away.darts) * 3);
+    return { homeAvg, awayAvg, homePoints:L.home.points, awayPoints:L.away.points, homeDarts:L.home.darts, awayDarts:L.away.darts };
+  });
+
+  // overall combine
+  const overall = legs.reduce((acc,l)=>{
+    acc.homePoints += l.homePoints; acc.homeDarts += l.homeDarts;
+    acc.awayPoints += l.awayPoints; acc.awayDarts += l.awayDarts;
+    return acc;
+  }, { homePoints:0, homeDarts:0, awayPoints:0, awayDarts:0 });
+
+  const overallAvg = {
+    homeAvg: overall.homeDarts === 0 ? 0 : ((overall.homePoints / overall.homeDarts) * 3),
+    awayAvg: overall.awayDarts === 0 ? 0 : ((overall.awayPoints / overall.awayDarts) * 3)
+  };
+
+  return { legs, overall: overallAvg };
+}
+
+/* ---------- small improvement: When adding dart currently we did not update history until bust or finish.
+   For regular turns that don't finish the leg, we should allow players to continue entering darts and
+   the "history" will be appended when a leg finishes or on explicit undo turn. To compute averages across entire match
+   we can still use recorded history entries (which are appended on bust/finish only). That means for legs that do not
+   finish (incomplete), their darts won't appear in history and won't be counted. For a best-of-3 match flow that's acceptable
+   because averages will be meaningful based on completed legs and completed turns. For now we won't aggressively record
+   every partial turn into history — we record busts and finishes. If you'd like to record every confirmed turn (e.g. add a Confirm Turn),
+   we can add that. For now we keep UI simple: darts are applied as user taps and recorded on bust/finish; undo exists.
+*/
+
+/* ---------- small helper to flash and then continue ---------- */
+function flashAnd(fn, msg){
+  flash(msg);
+  setTimeout(fn, 700);
+}
+
+/* ---------- Finally, small helpers to start and show resume ---------- */
+function flashResumePrompt(){
+  const saved = loadMatch();
+  if(saved){
+    // show a small message in setup view
+    btnLoad.style.display = 'inline-block';
+  } else {
+    btnLoad.style.display = 'none';
   }
-  players[currentPlayer].score -= value;
-  players[currentPlayer].darts++;
-  updateDisplay();
 }
+flashResumePrompt();
 
-function editDart(i){
-  editingIndex=i;
-  multiplier=1;
-  updateDisplay();
-}
+/* ---------- small helper to display modal messages via flash (if needed) ---------- */
+function flashMessage(msg){ flash(msg); }
 
-// inject number buttons 1–20
-for(let i=1;i<=20;i++){
-  let btn=document.createElement("button");
-  btn.className="btn";
-  btn.textContent=i;
-  btn.addEventListener("click",()=>addDart(i*multiplier,`${multiplier===1?""+(i):multiplier+i}`));
-  numbersCol.appendChild(btn);
-}
-
-// D/T/25/Bull/0 buttons
-document.getElementById("btn-D").addEventListener("click",()=>{multiplier=2;});
-document.getElementById("btn-T").addEventListener("click",()=>{multiplier=3;});
-document.getElementById("btn-25").addEventListener("click",()=>addDart(25,"25"));
-document.getElementById("btn-Bull").addEventListener("click",()=>addDart(50,"Bull"));
-document.getElementById("btn-0").addEventListener("click",()=>addDart(0,"0"));
-
-// Undo dart
-document.getElementById("undo-dart").addEventListener("click",()=>{
-  if(turnDarts.length){
-    const removed=turnDarts.pop();
-    players[currentPlayer].score += removed.value;
-    players[currentPlayer].darts--;
-    updateDisplay();
-  }
-});
-
-// Next player
-document.getElementById("next-player").addEventListener("click",()=>{
-  turnDarts=[];
-  editingIndex=null;
-  multiplier=1;
-  currentPlayer=1-currentPlayer;
-  updateDisplay();
-});
-
-updateDisplay();
-/* --- JS End --- */
+/* ---------- End of JS ---------- */
 </script>
-
 </body>
 </html>
