@@ -184,4 +184,6 @@ document.getElementById('submitTurn').onclick = () => {
       updateCheckout(1);
     }
     switchPlayer();
+    }
 };
+
