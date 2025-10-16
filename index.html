@@ -1,637 +1,245 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Legion Darts Scorer v2.2</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legion Darts Scorer v2.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg1:#eaf4ff; --bg2:#d6ecff;
-  --accent:#0b66ff; --accent2:#0b94ff; --green:#1f8a4c;
-  --muted:#6b7a86; --card:#ffffff; --danger:#d64545; --gold:#ffd700;
-  --rounded:12px; --shadow:0 8px 24px rgba(11,102,255,0.08);
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-*{box-sizing:border-box}
-body{
-  margin:0; min-height:100vh;
-  background:
-    radial-gradient(circle at 10% 10%, rgba(11,102,255,0.03), transparent 6%),
-    radial-gradient(circle at 90% 90%, rgba(11,102,255,0.02), transparent 6%),
-    linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:#06202a;
-}
-.app{max-width:980px;margin:0 auto;padding:12px;}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.logo{font-weight:800;color:var(--accent);font-size:18px}
-.banner{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:14px}
-
-/* Setup */
-.setup{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px}
-.row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
-.input{padding:8px;border-radius:8px;border:1px solid rgba(6,18,30,0.06);min-width:140px;font-size:16px}
-
-/* Board */
-.board{display:flex;gap:8px;margin-bottom:10px}
-.player{flex:1;background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);position:relative;min-width:120px}
-.player.highlight{box-shadow:0 12px 32px rgba(11,102,255,0.14);border:2px solid rgba(11,102,255,0.08)}
-.player-name{font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center}
-.score{font-size:34px;font-weight:900;color:var(--accent);margin:8px 0}
-.legs,.darts-mini{font-size:13px;color:var(--muted)}
-.threeDA{position:absolute;right:10px;top:10px;color:var(--danger);font-weight:700;font-size:12px;opacity:1}
-.threeDA.inactive{color:#999;opacity:0.9}
-
-/* Turn area */
-.turn-card{background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:10px}
-.turn-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.turn-banner{font-weight:800;color:var(--accent);font-size:16px}
-.darts-row{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
-.dart-col{display:flex;flex-direction:column;align-items:center}
-.dart-chip{
-  width:66px;padding:10px;border-radius:10px;background:#f7fbff;border:1px solid rgba(11,102,255,0.06);
-  text-align:center;font-weight:800;cursor:pointer;min-height:44px;
-}
-.dart-chip.editing{box-shadow:0 8px 20px rgba(11,102,255,0.12);color:white}
-.dart-val{font-size:13px;color:var(--muted);margin-top:6px}
-
-/* Entry grid */
-.entry-wrap{display:flex;gap:8px;align-items:flex-start}
-.mult-col{display:flex;flex-direction:column;gap:6px;width:86px}
-.mult-btn{padding:12px;border-radius:10px;border:0;background:linear-gradient(180deg,#fff,#f7fbff);font-weight:800;cursor:pointer}
-.mult-btn.active{background:linear-gradient(180deg,#ffdede,#ffd6d6);color:var(--danger)}
-.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex:1}
-.num-btn{padding:14px;border-radius:10px;border:0;background:linear-gradient(180deg,#fff,#f7fbff);font-weight:800;cursor:pointer}
-
-/* bottom row of keypad actions (4 buttons) */
-.keypad-bottom{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.key-action{padding:12px;border-radius:10px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent2));color:white;font-weight:800;cursor:pointer}
-.key-action.ghost{background:#eee;color:#333}
-
-/* controls / log */
-.controls{display:flex;gap:8px;margin-top:10px}
-.log{background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);max-height:200px;overflow:auto}
-
-/* modal */
-.modal-back{position:fixed;inset:0;background:rgba(6,18,30,0.45);display:flex;align-items:center;justify-content:center;z-index:80}
-.modal{background:white;padding:16px;border-radius:12px;max-width:560px;width:92%;box-shadow:0 16px 48px rgba(2,8,23,0.35)}
-.modal h3{margin-top:0}
-
-/* responsive tweaks */
-@media (max-width:700px){
-  .num-btn{padding:12px}
-  .dart-chip{width:56px}
-  .threeDA{font-size:11px}
-}
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f0f8ff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 { margin-top: 10px; color: #003366; }
+  .scoreboard {
+    display: flex;
+    justify-content: space-around;
+    width: 95%;
+    margin: 10px 0;
+    position: relative;
+  }
+  .player {
+    text-align: center;
+    padding: 10px;
+    border: 2px solid #003366;
+    border-radius: 10px;
+    width: 45%;
+    position: relative;
+  }
+  .active {
+    animation: pulse 1s infinite;
+    border-color: #0066cc;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 5px #0066cc; }
+    50% { box-shadow: 0 0 15px #0066cc; }
+    100% { box-shadow: 0 0 5px #0066cc; }
+  }
+  .dart-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 8px;
+    width: 95%;
+    margin-bottom: 10px;
+  }
+  button {
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    background-color: #0073e6;
+    color: white;
+  }
+  button:hover { background-color: #005bb5; }
+  .stats-overlay {
+    display: none;
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+  }
+  .stats-content {
+    background: #f0f8ff;
+    padding: 20px;
+    border-radius: 15px;
+    width: 85%;
+    max-width: 400px;
+    text-align: center;
+    animation: fadeIn 0.8s;
+  }
+  .close-btn {
+    position: absolute;
+    top: 10px; right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #003366;
+  }
+  @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
+  .dart-value { font-size: 14px; color: #003366; margin-top: 2px; }
+  .message { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+             font-size:32px; color:red; display:none; font-weight:bold; }
+  .threeDA { font-size: 14px; color:red; margin-top:4px; }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <div class="logo">Legion Darts Scorer</div>
-    <div class="banner" id="turn-banner">Setup match</div>
-    <div style="min-width:48px"></div>
+
+<h1>Legion Darts Scorer v2.3</h1>
+
+<div class="scoreboard">
+  <div id="home" class="player active">
+    Home (P1)<br>
+    <span id="home-score">501</span>
+    <div class="threeDA" id="home-3da"></div>
+    <div id="home-darts" class="dart-value"></div>
   </div>
-
-  <!-- SETUP -->
-  <div id="setup-view" class="setup" aria-hidden="false">
-    <div style="font-weight:800;margin-bottom:8px">Match setup</div>
-    <div class="row">
-      <label>Home name
-        <input id="input-home" class="input" placeholder="Home (P1)">
-      </label>
-      <label>Away name
-        <input id="input-away" class="input" placeholder="Away (P2)">
-      </label>
-    </div>
-    <div class="row" style="align-items:center;">
-      <label><input type="checkbox" id="toggle-double" checked> Double-Out required</label>
-      <div style="flex:1"></div>
-      <label>Best of <strong>3</strong> (first to 2)</label>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button id="btn-load" class="key-action ghost" style="background:#eee;color:#333;padding:8px 12px;">Resume saved</button>
-      <button id="btn-start" class="key-action" style="padding:8px 12px;">Start Match</button>
-    </div>
+  <div id="away" class="player">
+    Away (P2)<br>
+    <span id="away-score">501</span>
+    <div class="threeDA" id="away-3da"></div>
+    <div id="away-darts" class="dart-value"></div>
   </div>
+</div>
 
-  <!-- MAIN -->
-  <div id="main-view" style="display:none;">
-    <div class="board">
-      <div id="pl-home" class="player">
-        <div class="player-name">
-          <span id="name-home">Home (P1)</span>
-          <span class="threeDA inactive" id="threeDA-home" style="display:block">3DA: 0.0</span>
-        </div>
-        <div class="score" id="score-home">501</div>
-        <div class="legs" id="legs-home">Legs: 0</div>
-        <div class="darts-mini" id="darts-home">Darts: 0</div>
-      </div>
+<div class="message" id="message"></div>
 
-      <div id="pl-away" class="player">
-        <div class="player-name">
-          <span id="name-away">Away (P2)</span>
-          <span class="threeDA inactive" id="threeDA-away" style="display:block">3DA: 0.0</span>
-        </div>
-        <div class="score" id="score-away">501</div>
-        <div class="legs" id="legs-away">Legs: 0</div>
-        <div class="darts-mini" id="darts-away">Darts: 0</div>
-      </div>
-    </div>
+<div class="dart-buttons">
+  <button onclick="setMultiplier('D')">D</button>
+  <button onclick="setMultiplier('T')">T</button>
+  <button onclick="setMultiplier('1')">1</button>
+  <button onclick="setMultiplier('2')">2</button>
 
-    <div class="turn-card">
-      <div class="turn-top">
-        <div id="turn-info">Current: <strong id="current-player-label">Home (P1)</strong></div>
-        <div class="turn-total">Turn total: <span id="turn-total">0</span></div>
-      </div>
+  <button onclick="setMultiplier('3')">3</button>
+  <button onclick="setMultiplier('4')">4</button>
+  <button onclick="setMultiplier('5')">5</button>
+  <button onclick="setMultiplier('6')">6</button>
 
-      <div class="darts-row" id="darts-list"></div>
+  <button onclick="setMultiplier('7')">7</button>
+  <button onclick="setMultiplier('8')">8</button>
+  <button onclick="setMultiplier('9')">9</button>
+  <button onclick="setMultiplier('10')">10</button>
 
-      <div class="entry-wrap">
-        <div class="mult-col">
-          <button id="btn-D" class="mult-btn" data-mult="2">D</button>
-          <button id="btn-T" class="mult-btn" data-mult="3">T</button>
-          <button id="btn-25" class="mult-btn" data-action="25">25</button>
-          <button id="btn-Bull" class="mult-btn" data-action="Bull">Bull</button>
-          <button id="btn-Coin" class="mult-btn" data-action="Coin">💰</button>
-        </div>
-        <div class="nums" id="numbers-col"></div>
-      </div>
+  <button onclick="setMultiplier('11')">11</button>
+  <button onclick="setMultiplier('12')">12</button>
+  <button onclick="setMultiplier('13')">13</button>
+  <button onclick="setMultiplier('14')">14</button>
 
-      <div class="keypad-bottom" id="keypad-bottom">
-        <button id="coinBtn" class="key-action key-action--ghost" style="background:#f0f0f0;color:#333">💰</button>
-        <button id="undoDartBtn" class="key-action key-action--ghost" style="background:#f0f0f0;color:#333">Undo Dart</button>
-        <button id="submitBtn" class="key-action">Submit Turn</button>
-        <button id="undoTurnBtn" class="key-action key-action--ghost" style="background:#f0f0f0;color:#333">Undo Last Turn</button>
-      </div>
+  <button onclick="setMultiplier('15')">15</button>
+  <button onclick="setMultiplier('16')">16</button>
+  <button onclick="setMultiplier('17')">17</button>
+  <button onclick="setMultiplier('18')">18</button>
 
-    </div>
+  <button onclick="setMultiplier('19')">19</button>
+  <button onclick="setMultiplier('20')">20</button>
+  <button onclick="setMultiplier('25')">25</button>
+  <button onclick="setMultiplier('B')">Bull</button>
 
-    <div class="log" id="log"><div style="color:var(--muted)">Match log will appear here</div></div>
+  <button onclick="showStats()">📊</button>
+  <button onclick="undoLastDart()">↩️ Dart</button>
+  <button onclick="submitTurn()">✔️ Turn</button>
+  <button onclick="undoLastTurn()">↩️ Turn</button>
+</div>
+
+<div class="stats-overlay" id="statsOverlay">
+  <div class="stats-content">
+    <span class="close-btn" onclick="closeStats()">×</span>
+    <h2>Stats Overlay</h2>
+    <p id="statsText"></p>
   </div>
-
-  <div id="modal-root"></div>
 </div>
 
 <script>
-/* v2.2 single-file JS - Implements requested features */
-const START_SCORE = 501;
-const LEGS_TO_WIN = 2;
-const STORAGE_KEY = 'legion:scorer:v2.2';
+let homeScore = 501;
+let awayScore = 501;
+let currentPlayer = 'home';
+let dartsThisTurn = [];
+let allDarts = { home: [], away: [] };
+let multiplier = 1;
 
-function createPlayer(name){ return { name, score: START_SCORE, dartsThrown:0, highestCheckout:0 }; }
-
-let state = {
-  settings: { doubleOut: true },
-  players: { home: createPlayer('Home (P1)'), away: createPlayer('Away (P2)') },
-  current: 'home',
-  starter: 'home',
-  turnStartScore: null,
-  turnDarts: [], // staged [{label,val,mult,base}]
-  history: [],
-  matchLegs: {home:0,away:0},
-  playing: false
-};
-
-/* DOM helpers */
-const $ = id => document.getElementById(id);
-const setupView = $('setup-view'), mainView = $('main-view');
-const inputHome = $('input-home'), inputAway = $('input-away'), toggleDouble = $('toggle-double');
-const btnStart = $('btn-start'), btnLoad = $('btn-load');
-const turnBanner = $('turn-banner');
-const nameHomeEl = $('name-home'), nameAwayEl = $('name-away');
-const scoreHomeEl = $('score-home'), scoreAwayEl = $('score-away');
-const legsHomeEl = $('legs-home'), legsAwayEl = $('legs-away');
-const dartsHomeMini = $('darts-home'), dartsAwayMini = $('darts-away');
-const currentPlayerLabel = $('current-player-label'), turnTotalEl = $('turn-total');
-const dartsListEl = $('darts-list'), numbersCol = $('numbers-col');
-const btnD = $('btn-D'), btnT = $('btn-T'), btn25 = $('btn-25'), btnBull = $('btn-Bull');
-const coinBtn = $('coinBtn'), undoDartBtn = $('undoDartBtn'), submitBtn = $('submitBtn'), undoTurnBtn = $('undoTurnBtn');
-const threeDAHome = $('threeDA-home'), threeDAAway = $('threeDA-away');
-const plHome = $('pl-home'), plAway = $('pl-away');
-const logEl = $('log'), modalRoot = $('modal-root');
-
-/* persistence */
-function save(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-function load(){
-  try{ const s = JSON.parse(localStorage.getItem(STORAGE_KEY)); if(s) { state = s; state.players.home = Object.assign(createPlayer('Home (P1)'), state.players.home); state.players.away = Object.assign(createPlayer('Away (P2)'), state.players.away); return true; } }catch(e){} return false;
-}
-function clearSaved(){ localStorage.removeItem(STORAGE_KEY); }
-
-/* init */
-function init(){
-  // numbers 1..20 in 4-column grid
-  numbersCol.innerHTML='';
-  for(let i=1;i<=20;i++){
-    const b = document.createElement('button');
-    b.className = 'num-btn';
-    b.textContent = i;
-    b.dataset.num = i;
-    b.addEventListener('click', ()=>onNumberClick(i));
-    numbersCol.appendChild(b);
-  }
-  // bindings
-  btnStart.addEventListener('click', startMatchFromSetup);
-  btnLoad.addEventListener('click', resumeSaved);
-  btnD.addEventListener('click', ()=>setPendingMultiplier(2));
-  btnT.addEventListener('click', ()=>setPendingMultiplier(3));
-  btn25.addEventListener('click', ()=>onSpecial('25'));
-  btnBull.addEventListener('click', ()=>onSpecial('Bull'));
-  $('btn-Coin').addEventListener('click', ()=>onSpecial('Coin'));
-  coinBtn.addEventListener('click', ()=>onSpecial('Coin'));
-  undoDartBtn.addEventListener('click', undoDart);
-  submitBtn.addEventListener('click', submitTurn);
-  undoTurnBtn.addEventListener('click', undoLastTurn);
-
-  renderSetup();
-  $('btn-load').style.display = localStorage.getItem(STORAGE_KEY) ? 'inline-block' : 'none';
-}
-init();
-
-/* UI rendering */
-function renderSetup(){
-  setupView.style.display='block'; mainView.style.display='none'; turnBanner.textContent='Setup match';
-}
-function renderMain(){
-  setupView.style.display='none'; mainView.style.display='block'; updateBoard(); renderTurn(); renderLog(); save();
-}
-function updateBoard(){
-  nameHomeEl.textContent = state.players.home.name;
-  nameAwayEl.textContent = state.players.away.name;
-
-  // clamp displayed scores to >=0 to avoid negative display
-  scoreHomeEl.textContent = Math.max(0, state.players.home.score);
-  scoreAwayEl.textContent = Math.max(0, state.players.away.score);
-
-  legsHomeEl.textContent = `Legs: ${state.matchLegs.home}`;
-  legsAwayEl.textContent = `Legs: ${state.matchLegs.away}`;
-  dartsHomeMini.textContent = `Darts: ${state.players.home.dartsThrown}`;
-  dartsAwayMini.textContent = `Darts: ${state.players.away.dartsThrown}`;
-
-  plHome.classList.toggle('highlight', state.current === 'home');
-  plAway.classList.toggle('highlight', state.current === 'away');
-
-  turnBanner.textContent = `${state.players[state.current].name} to throw`;
-  currentPlayerLabel.textContent = state.players[state.current].name;
-
-  // 3DA compute and show active/greyed
-  const three = compute3DA();
-  if(state.current === 'home'){
-    threeDAHome.className = 'threeDA'; threeDAHome.textContent = `3DA: ${three.home.toFixed(1)}`; threeDAHome.style.display='block';
-    threeDAwayGrey();
-  } else {
-    threeDAway.className = 'threeDA'; threeDAway.textContent = `3DA: ${three.away.toFixed(1)}`; threeDAway.style.display='block';
-    threeDAhomeGrey();
-  }
-  // ensure both exist as elements even if hidden toggles
-  function threeDAwayGrey(){ threeDAAway.className='threeDA inactive'; threeDAAway.textContent = `3DA: ${three.away.toFixed(1)}`; threeDAAway.style.display='block'; }
-  function threeDAhomeGrey(){ threeDAHome.className='threeDA inactive'; threeDAHome.textContent = `3DA: ${three.home.toFixed(1)}`; threeDAHome.style.display='block'; }
+function setMultiplier(val){
+  if(val === 'D'){ multiplier = 2; return; }
+  if(val === 'T'){ multiplier = 3; return; }
+  if(val === 'B'){ val = 25; multiplier = 2; } 
+  val = parseInt(val);
+  recordDart(val * multiplier, val + (multiplier>1? ` (${multiplier}x)` : '' ));
+  multiplier = 1; // reset after use
 }
 
-/* render staged darts */
-function renderTurn(){
-  dartsListEl.innerHTML = '';
-  for(let i=0;i<3;i++){
-    const col = document.createElement('div'); col.className='dart-col';
-    const chip = document.createElement('div'); chip.className='dart-chip';
-    const d = state.turnDarts[i];
-    if(d){
-      chip.textContent = d.label;
-      chip.style.background = dartColor(d);
-      chip.addEventListener('click', ()=>beginEdit(i));
-      if(d.editing) chip.classList.add('editing');
-      const val = document.createElement('div'); val.className='dart-val'; val.textContent = `${d.val}`;
-      col.appendChild(chip); col.appendChild(val);
-    } else {
-      chip.textContent = (i+1);
-      chip.addEventListener('click', ()=>beginEdit(i));
-      const val = document.createElement('div'); val.className='dart-val'; val.textContent = '-';
-      col.appendChild(chip); col.appendChild(val);
-    }
-    dartsListEl.appendChild(col);
-  }
-  const total = state.turnDarts.reduce((s,d)=>s+(d?d.val:0),0);
-  $('turn-total').textContent = total;
+function recordDart(scoreVal, label){
+  if(dartsThisTurn.length >=3){ showMessage("Max 3 darts!"); return; }
+  dartsThisTurn.push({score:scoreVal, label:label});
+  allDarts[currentPlayer].push({score:scoreVal, label:label});
+  updateScoreboard();
 }
 
-/* compute chip subtle color */
-function dartColor(d){
-  if(!d) return '#f7fbff';
-  if(d.label === 'Bull') return 'linear-gradient(90deg,#ffd700,#ffec8a)';
-  if(d.mult === 3) return '#ffdfdf';
-  if(d.mult === 2) return '#dff4ff';
-  return '#f7fbff';
+function updateScoreboard(){
+  let scoreEl = document.getElementById(currentPlayer+'-score');
+  let dartsEl = document.getElementById(currentPlayer+'-darts');
+  let currentScore = (currentPlayer==='home'? homeScore: awayScore);
+  let turnScore = dartsThisTurn.reduce((a,b)=>a+b.score,0);
+  let newScore = currentScore - turnScore;
+  if(newScore<0){ showMessage("BUST!"); dartsThisTurn=[]; updateScoreboard(); return; }
+  scoreEl.textContent = newScore;
+  dartsEl.innerHTML = dartsThisTurn.map(d=>d.label).join(' | ');
+  document.getElementById(currentPlayer+'-3da').textContent = `3DA: ${calculate3DA(currentPlayer)}`;
 }
 
-/* log */
-function renderLog(){
-  if(!state.history.length){ logEl.innerHTML = `<div style="color:var(--muted)">No turns yet</div>`; return; }
-  logEl.innerHTML = '';
-  state.history.slice().reverse().forEach(h=>{
-    const who = state.players[h.player].name;
-    const parts = h.darts.map(d=>d.label).join(' • ');
-    const node = document.createElement('div'); node.style.marginBottom='8px';
-    node.innerHTML = `<div style="font-weight:700">${who}</div>
-      <div style="color:var(--muted)">Start ${h.startScore} → ${h.newScore} (${h.turnTotal}) ${h.bust?'<strong style="color:var(--danger)">BUST</strong>':''}${h.legWon?'<strong style="color:var(--ok)"> LEG</strong>':''}</div>
-      <div>${parts}</div>`;
-    logEl.appendChild(node);
-  });
+function calculate3DA(player){
+  let darts = allDarts[player].map(d=>d.score);
+  let total = darts.reduce((a,b)=>a+b,0);
+  return darts.length? (total/darts.length*3).toFixed(1) : '';
 }
 
-/* ---------- Input logic ---------- */
-let pendingMultiplier = 1;
-function setPendingMultiplier(m){
-  pendingMultiplier = (pendingMultiplier === m) ? 1 : m;
-  btnD.classList.toggle('active', pendingMultiplier === 2);
-  btnT.classList.toggle('active', pendingMultiplier === 3);
-}
-function onNumberClick(n){
-  const label = pendingMultiplier===1 ? `${n}` : (pendingMultiplier===2 ? `D${n}` : `T${n}`);
-  const val = pendingMultiplier===1 ? n : n*pendingMultiplier;
-  addOrEditDart({label,val,mult:pendingMultiplier,base:n});
-}
-function onSpecial(code){
-  if(code==='25') addOrEditDart({label:'25', val:25, mult:1, base:25});
-  else if(code==='Bull') addOrEditDart({label:'Bull', val:50, mult:2, base:25});
-  else if(code==='Coin') flash('Coin placeholder');
-}
-
-/* add or edit */
-function addOrEditDart(dart){
-  // editing?
-  if(state.turnDarts.editingIndex !== undefined && state.turnDarts.editingIndex !== null){
-    const i = state.turnDarts.editingIndex;
-    // revert previous staged dart effect
-    if(state.turnDarts[i]){
-      state.players[state.current].score += state.turnDarts[i].val;
-      state.players[state.current].dartsThrown = Math.max(0, state.players[state.current].dartsThrown - 1);
-    }
-    // replace and apply
-    state.turnDarts[i] = dart;
-    delete state.turnDarts.editingIndex;
-    state.turnDarts.forEach(x=>{ if(x) delete x.editing; });
-    state.players[state.current].score -= dart.val;
-    state.players[state.current].dartsThrown += 1;
-    pendingMultiplier = 1; btnD.classList.remove('active'); btnT.classList.remove('active');
-    renderTurn(); updateBoard(); save();
-    return;
-  }
-
-  // normal add
-  if(state.turnDarts.length === 0) state.turnStartScore = state.players[state.current].score;
-  if(state.turnDarts.length >= 3){ flash('Already 3 darts staged — submit or undo'); return; }
-  state.turnDarts.push(dart);
-  state.players[state.current].score -= dart.val;
-  state.players[state.current].dartsThrown += 1;
-  pendingMultiplier = 1; btnD.classList.remove('active'); btnT.classList.remove('active');
-  renderTurn(); updateBoard(); save();
-}
-
-/* begin edit */
-function beginEdit(index){
-  if(index >= state.turnDarts.length){ flash('No dart at that slot — tap a number to add'); return; }
-  state.turnDarts.editingIndex = index;
-  state.turnDarts.forEach((d,i)=>{ if(d) d.editing = (i===index); });
-  turnBanner.textContent = `Editing dart ${index+1} — pick multiplier then number`;
-  renderTurn();
-}
-
-/* undo staged dart */
-function undoDart(){
-  if(state.turnDarts.length === 0){ flash('No staged darts'); return; }
-  const removed = state.turnDarts.pop();
-  // revert
-  state.players[state.current].score += removed.val;
-  state.players[state.current].dartsThrown = Math.max(0, state.players[state.current].dartsThrown - 1);
-  delete state.turnDarts.editingIndex;
-  state.turnDarts.forEach(d=>{ if(d) delete d.editing; });
-  if(state.turnDarts.length === 0) state.turnStartScore = null;
-  renderTurn(); updateBoard(); save();
-}
-
-/* submit turn */
 function submitTurn(){
-  if(state.turnDarts.length === 0){ flash('Enter at least one dart'); return; }
-  const p = state.current;
-  const player = state.players[p];
-  const startScore = (state.turnStartScore !== null) ? state.turnStartScore : (player.score + state.turnDarts.reduce((s,d)=>s+d.val,0));
-  const turnTotal = state.turnDarts.reduce((s,d)=>s+d.val,0);
-  const final = startScore - turnTotal;
-
-  // bust conditions
-  let bust=false, finished=false;
-  if(final < 0) bust=true;
-  else if(final === 1) bust=true;
-  else if(final === 0){
-    const last = state.turnDarts[state.turnDarts.length-1];
-    const isDoubleBull = (last && last.label === 'Bull' && state.settings.doubleOut);
-    const isDouble = (last && last.mult === 2);
-    if(state.settings.doubleOut){
-      if(isDouble || isDoubleBull) finished=true;
-      else bust=true;
-    } else finished=true;
-  }
-
-  if(bust){
-    // keep darts visible for 2s then revert and switch
-    const entry = { player: p, startScore, darts: state.turnDarts.slice(), newScore: startScore, turnTotal:0, bust:true, legWon:false, legIndex: state.matchLegs.home + state.matchLegs.away };
-    state.history.push(entry);
-    renderLog(); save();
-    flash('BUST!');
-    // hold 2s then revert
-    setTimeout(()=>{
-      state.players[p].score = startScore; // revert
-      state.turnDarts = []; state.turnStartScore = null;
-      save(); renderTurn(); updateBoard(); // then switch
-      switchPlayer();
-    }, 2000);
-    return;
-  }
-
-  if(finished){
-    const entry = { player:p, startScore, darts: state.turnDarts.slice(), newScore:0, turnTotal, bust:false, legWon:true, legIndex: state.matchLegs.home + state.matchLegs.away };
-    state.history.push(entry);
-    // highest checkout
-    if(turnTotal > state.players[p].highestCheckout) state.players[p].highestCheckout = turnTotal;
-    state.matchLegs[p] += 1;
-    renderLog(); save();
-    // show leg or match popup
-    if(state.matchLegs[p] >= LEGS_TO_WIN){
-      showMatchSummary(p);
-      return;
-    } else {
-      showLegPopup(p);
-      return;
-    }
-  }
-
-  // normal turn
-  const entry = { player:p, startScore, darts: state.turnDarts.slice(), newScore: final, turnTotal, bust:false, legWon:false, legIndex: state.matchLegs.home + state.matchLegs.away };
-  state.history.push(entry);
-  state.players[p].score = final;
-  renderLog(); save();
-  // clear staged and switch
-  state.turnDarts = []; state.turnStartScore = null;
-  switchPlayer();
+  if(dartsThisTurn.length===0){ showMessage("Enter at least 1 dart"); return; }
+  let scoreEl = document.getElementById(currentPlayer+'-score');
+  if(currentPlayer==='home'){ homeScore=parseInt(scoreEl.textContent); currentPlayer='away'; } 
+  else{ awayScore=parseInt(scoreEl.textContent); currentPlayer='home'; }
+  dartsThisTurn=[];
+  updateActivePlayer();
 }
 
-/* switch player */
-function switchPlayer(){
-  state.current = (state.current === 'home') ? 'away' : 'home';
-  state.turnDarts.forEach(d=>{ if(d) delete d.editing; });
-  renderTurn(); updateBoard(); save();
+function updateActivePlayer(){
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('away').classList.remove('active');
+  document.getElementById(currentPlayer).classList.add('active');
 }
 
-/* undo last confirmed turn */
+function undoLastDart(){
+  if(dartsThisTurn.length>0){ dartsThisTurn.pop(); updateScoreboard(); }
+}
+
 function undoLastTurn(){
-  if(!state.history.length){ flash('No confirmed turns to undo'); return; }
-  if(!confirm('Undo last confirmed turn? This will revert score and leg if needed.')) return;
-  const last = state.history.pop();
-  const p = last.player;
-  // revert
-  state.players[p].score = last.startScore;
-  state.players[p].dartsThrown = Math.max(0, state.players[p].dartsThrown - last.darts.length);
-  if(last.legWon) state.matchLegs[p] = Math.max(0, state.matchLegs[p]-1);
-  // make it current player's turn again
-  state.current = p;
-  state.turnDarts = [];
-  state.turnStartScore = null;
-  renderTurn(); updateBoard(); renderLog(); save();
-  flash('Last turn undone');
+  if(allDarts[currentPlayer].length>0){
+    for(let i=0;i<3;i++){ if(allDarts[currentPlayer].length>0) allDarts[currentPlayer].pop(); }
+    updateScoreboard();
+  }
 }
 
-/* leg popup */
-function showLegPopup(winnerKey){
-  const winnerName = state.players[winnerKey].name;
-  const html = `<h3>🏆 Leg won</h3><div style="font-weight:800">${winnerName} wins the leg</div>
-    <div style="margin-top:8px">Match: ${state.players.home.name} ${state.matchLegs.home} — ${state.matchLegs.away} ${state.players.away.name}</div>
-    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="continueLeg" class="key-action">Continue</button></div>`;
-  showModal(html);
-  document.getElementById('continueLeg').addEventListener('click', ()=>{
-    clearModal();
-    // alternate starter and reset scores
-    state.starter = state.starter === 'home' ? 'away' : 'home';
-    state.current = state.starter;
-    state.players.home.score = START_SCORE;
-    state.players.away.score = START_SCORE;
-    state.turnDarts = []; state.turnStartScore = null;
-    save(); renderMain();
+function showMessage(msg){
+  let el = document.getElementById('message');
+  el.textContent = msg;
+  el.style.display='block';
+  setTimeout(()=>{ el.style.display='none'; }, 1000);
+}
+
+function showStats(){
+  let overlay = document.getElementById('statsOverlay');
+  overlay.style.display='flex';
+  let text = '';
+  ['home','away'].forEach(p=>{
+    text += `${p.toUpperCase()} 3DA: ${calculate3DA(p)} | First9 Avg: --- | High Turn: --- <br>`;
   });
+  document.getElementById('statsText').innerHTML = text;
 }
 
-/* match summary */
-function showMatchSummary(winnerKey){
-  const winnerName = state.players[winnerKey].name;
-  const summary = buildMatchSummaryFromHistory();
-  let html = `<h3>🏁 Match Result</h3><div style="font-weight:800">${state.players.home.name} ${state.matchLegs.home} — ${state.matchLegs.away} ${state.players.away.name}</div>
-    <div style="margin-top:8px">Winner: <strong>${winnerName}</strong></div><hr>`;
-  if(summary.legs.length){
-    summary.legs.forEach((L,i)=>{
-      html += `<div style="margin:6px 0"><strong>Leg ${i+1}:</strong> ${state.players.home.name} 3DA ${L.homeAvg.toFixed(1)}  |  ${state.players.away.name} 3DA ${L.awayAvg.toFixed(1)}</div>`;
-    });
-  } else html += `<div style="color:var(--muted)">No leg averages</div>`;
-  html += `<hr><div style="display:flex;gap:12px;justify-content:space-between"><div><strong>Overall 3DA</strong><div>${state.players.home.name}: ${summary.overall.homeAvg.toFixed(1)}</div></div><div><div style="visibility:hidden">x</div><div>${state.players.away.name}: ${summary.overall.awayAvg.toFixed(1)}</div></div></div>`;
-  html += `<div style="display:flex;justify-content:flex-end;margin-top:12px"><button id="btn-newmatch" class="key-action">New Match</button><button id="btn-close" class="key-action ghost" style="background:#eee;color:#333;margin-left:8px">Close</button></div>`;
-  showModal(html);
-  document.getElementById('btn-newmatch').addEventListener('click', ()=>{ clearModal(); resetMatch(); });
-  document.getElementById('btn-close').addEventListener('click', ()=>{ clearModal(); save(); renderSetup(); });
+function closeStats(){
+  document.getElementById('statsOverlay').style.display='none';
 }
-
-/* build summary from history */
-function buildMatchSummaryFromHistory(){
-  const legsMap = {};
-  state.history.forEach(h=>{
-    const idx = h.legIndex || 0;
-    if(!legsMap[idx]) legsMap[idx] = { home:{points:0,darts:0}, away:{points:0,darts:0} };
-    if(h.bust){
-      legsMap[idx][h.player].darts += h.darts.length;
-    } else {
-      legsMap[idx][h.player].darts += h.darts.length;
-      legsMap[idx][h.player].points += h.turnTotal || 0;
-    }
-  });
-  const legs = Object.keys(legsMap).sort((a,b)=>a-b).map(k=>{
-    const L = legsMap[k];
-    const homeAvg = L.home.darts===0?0:((L.home.points / L.home.darts)*3);
-    const awayAvg = L.away.darts===0?0:((L.away.points / L.away.darts)*3);
-    return { homeAvg, awayAvg, homePoints:L.home.points, awayPoints:L.away.points, homeDarts:L.home.darts, awayDarts:L.away.darts };
-  });
-  let homePoints=0,homeDarts=0,awayPoints=0,awayDarts=0;
-  legs.forEach(l=>{ homePoints+=l.homePoints; homeDarts+=l.homeDarts; awayPoints+=l.awayPoints; awayDarts+=l.awayDarts; });
-  const overall = { homeAvg: homeDarts===0?0:((homePoints/homeDarts)*3), awayAvg: awayDarts===0?0:((awayPoints/awayDarts)*3) };
-  return { legs, overall };
-}
-
-/* compute live 3DA from history (only confirmed turns) */
-function compute3DA(){
-  let hPoints=0,hDarts=0,aPoints=0,aDarts=0;
-  state.history.forEach(h=>{
-    if(h.bust){ if(h.player==='home') hDarts+=h.darts.length; else aDarts+=h.darts.length; }
-    else { if(h.player==='home'){ hDarts+=h.darts.length; hPoints+=h.turnTotal; } else { aDarts+=h.darts.length; aPoints+=h.turnTotal; } }
-  });
-  return { home: hDarts===0?0:((hPoints/hDarts)*3), away: aDarts===0?0:((aPoints/aDarts)*3) };
-}
-
-/* modal helpers */
-function showModal(html){ modalRoot.innerHTML = `<div class="modal-back"><div class="modal">${html}</div></div>`; }
-function clearModal(){ modalRoot.innerHTML = ''; }
-
-/* reset match */
-function resetMatch(){
-  state = { settings:{doubleOut:true}, players:{ home:createPlayer('Home (P1)'), away:createPlayer('Away (P2)') }, current:'home', starter:'home', turnStartScore:null, turnDarts:[], history:[], matchLegs:{home:0,away:0}, playing:false };
-  clearSaved(); save(); inputHome.value=''; inputAway.value=''; toggleDouble.checked=true; renderSetup(); flash('Match reset');
-}
-
-/* resume saved */
-function resumeSaved(){
-  const ok = load();
-  if(!ok){ flash('No saved match'); return; }
-  inputHome.value = state.players.home.name;
-  inputAway.value = state.players.away.name;
-  toggleDouble.checked = state.settings.doubleOut;
-  state.playing = true;
-  renderMain();
-  flash('Saved match resumed');
-}
-
-/* start from setup */
-function startMatchFromSetup(){
-  const h = inputHome.value.trim() || 'Home (P1)';
-  const a = inputAway.value.trim() || 'Away (P2)';
-  state.players.home = createPlayer(h);
-  state.players.away = createPlayer(a);
-  state.settings.doubleOut = !!toggleDouble.checked;
-  state.matchLegs = {home:0,away:0};
-  state.history = [];
-  state.turnDarts = [];
-  state.turnStartScore = null;
-  state.current = state.starter = 'home';
-  state.playing = true;
-  save();
-  renderMain();
-  flash('Match started');
-}
-
-/* small toast */
-function flash(msg){
-  const t = document.createElement('div');
-  t.style.position='fixed'; t.style.left='50%'; t.style.transform='translateX(-50%)';
-  t.style.bottom='18px'; t.style.padding='10px 14px'; t.style.background='rgba(6,18,30,0.85)';
-  t.style.color='white'; t.style.borderRadius='10px'; t.style.zIndex=200; t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=> t.style.opacity='0',1400);
-  setTimeout(()=> t.remove(),1800);
-}
-
-/* small helper save */
-function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
-
-/* Expose a minimal console helper */
-window._legion = { state, save, load };
-
-/* end of script */
 </script>
 </body>
 </html>
