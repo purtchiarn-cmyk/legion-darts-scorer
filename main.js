@@ -179,3 +179,11 @@ document.getElementById('submitTurn').onclick = () => {
       scoreEls[0].textContent = 501;
       scoreEls[1].textContent = 501;
       avgEls[0].textContent = '
+      avgEls[0].textContent = '3DA: 0.00';
+      avgEls[1].textContent = '3DA: 0.00';
+      updateDarts();
+      updateCheckout(0);
+      updateCheckout(1);
+    }
+    switchPlayer();
+};
