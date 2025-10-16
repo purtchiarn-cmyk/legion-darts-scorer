@@ -229,6 +229,23 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:inherit; -webkit
 <script>
 /* Legion Darts Scorer v2.4 (polished) JS */
 const START = 501;
+// --- Start screen logic ---
+const startBtn = document.getElementById('startGame');
+const startScreen = document.getElementById('startScreen');
+const gameScreen = document.getElementById('gameScreen');
+const homeInput = document.getElementById('homeName');
+const awayInput = document.getElementById('awayName');
+
+if(startBtn){
+  startBtn.addEventListener('click', () => {
+    const homeName = homeInput.value || 'Home';
+    const awayName = awayInput.value || 'Away';
+    document.querySelector('#home h2').textContent = `${homeName} (P1)`;
+    document.querySelector('#away h2').textContent = `${awayName} (P2)`;
+    startScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+  });
+}
 const STORAGE = 'legion:scorer:v2.4';
 let state = {
   players: [
