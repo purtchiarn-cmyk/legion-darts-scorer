@@ -83,7 +83,6 @@ function updateCheckout(i) {
     148: 'T20 T16 D20', 147: 'T20 T17 D18', 146: 'T20 T18 D16',
     145: 'T20 T15 D20', 144: 'T20 T20 D12', 143: 'T20 T17 D16',
     142: 'T20 T14 D20', 141: 'T20 T19 D12', 140: 'T20 T20 D10'
-    // Add more if needed
   };
   checkoutEls[i].textContent = score <= 170 && score >= 2 && table[score] ? `Finish: ${table[score]}` : '';
 }
@@ -179,4 +178,4 @@ document.getElementById('submitTurn').onclick = () => {
       matchState.currentDarts = [[], []];
       scoreEls[0].textContent = 501;
       scoreEls[1].textContent = 501;
-      avgEls[0].textContent = '3DA: 0.
+      avgEls[0].textContent = '
