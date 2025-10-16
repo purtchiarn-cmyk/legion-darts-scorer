@@ -169,7 +169,6 @@ document.getElementById('submitTurn').onclick = () => {
 
     if (matchState.legsWon[matchState.active] > matchState.legsToWin / 2) {
       showMessage(`🏆 ${matchState.active === 0 ? 'Home' : 'Away'} wins the match!`);
-      // Optionally disable input or reset
     } else {
       showMessage(`Leg ${matchState.currentLeg} won!`);
       matchState.currentLeg++;
@@ -178,7 +177,6 @@ document.getElementById('submitTurn').onclick = () => {
       matchState.currentDarts = [[], []];
       scoreEls[0].textContent = 501;
       scoreEls[1].textContent = 501;
-      avgEls[0].textContent = '
       avgEls[0].textContent = '3DA: 0.00';
       avgEls[1].textContent = '3DA: 0.00';
       updateDarts();
