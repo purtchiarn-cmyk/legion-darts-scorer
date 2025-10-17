@@ -54,15 +54,12 @@
       const voice = document.getElementById("voiceInput").checked;
       const access = document.getElementById("accessibilityMode").checked;
 
-      // Save settings to localStorage
       localStorage.setItem("matchSettings", JSON.stringify({
         playerA, playerB, matchType, legs, tripod, voice, access
       }));
 
-      // Redirect to live match screen
       window.location.href = "index.html";
     });
   </script>
 
 </body>
-</html>
