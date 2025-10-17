@@ -1,5 +1,55 @@
-.accessibility-mode {
-  font-size: 1.25rem;
-  background-color: #000;
-  color: #fff;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Darts Match</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+
+  <main class="match-screen">
+
+    <!-- Match Header -->
+    <header>
+      <h1 id="match-title">Match: Player A vs Player B</h1>
+      <p id="match-meta">League Match — Leg 1 of 5</p>
+    </header>
+
+    <!-- Scoreboard -->
+    <section class="scoreboard">
+      <div class="player" id="player-a">
+        <h2 class="name">Player A</h2>
+        <p class="score">501</p>
+        <p class="3da">3DA: —</p>
+      </div>
+      <div class="player" id="player-b">
+        <h2 class="name">Player B</h2>
+        <p class="score">501</p>
+        <p class="3da">3DA: —</p>
+      </div>
+    </section>
+
+    <!-- Turn Input -->
+    <section class="turn-panel">
+      <label for="score-input">Enter Score:</label>
+      <input type="number" id="score-input" />
+      <div class="buttons">
+        <button id="submit-turn">Submit</button>
+        <button id="undo-turn">Undo</button>
+      </div>
+      <p id="bust-alert" hidden>Bust!</p>
+    </section>
+
+    <!-- Controls -->
+    <footer class="controls">
+      <button id="end-match">End Match</button>
+      <button id="toggle-accessibility">A+</button>
+      <button id="toggle-mic">🎙️</button>
+    </footer>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
