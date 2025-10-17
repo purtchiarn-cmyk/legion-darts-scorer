@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Summary</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <main class="summary-page">
+    <h1>Match Summary</h1>
+
+    <section class="summary-stats">
+      <div class="player-summary">
+        <h2 id="summary-player-a">Player A</h2>
+        <p id="final-score-a">Final Score: 0</p>
+        <p id="final-3da-a">3DA: 45.2</p>
+      </div>
+
+      <div class="player-summary">
+        <h2 id="summary-player-b">Player B</h2>
+        <p id="final-score-b">Final Score: 0</p>
+        <p id="final-3da-b">3DA: 47.8</p>
+      </div>
+    </section>
+
+    <section class="summary-actions">
+      <button id="export-csv">Export Match Data</button>
+      <button onclick="window.location.href='start.html'">Start New Match</button>
+    </section>
+  </main>
+
+  <script>
+    const settings = JSON.parse(localStorage.getItem("matchSettings")) || {};
+    const stats = JSON.parse(localStorage.getItem("matchStats")) || {};
+
+    document.getElementById("summary-player-a").textContent = settings.playerA || "Player A";
+    document.getElementById("summary-player-b").textContent = settings.playerB || "Player B";
+
+    document.getElementById("final-score-a").textContent = `Final Score: ${stats.finalScoreA || 0}`;
+    document.getElementById("final-score-b").textContent = `Final Score: ${stats.finalScoreB || 0}`;
+
+    document.getElementById("final-3da-a").textContent = `3DA: ${stats.daA || "N/A"}`;
+    document.getElementById("final-3da-b").textContent = `3DA: ${stats.daB || "N/A"}`;
+
+    document.getElementById("export-csv").addEventListener("click", () => {
+      const csv = `Player,Final Score,3DA\n${settings.playerA},${stats.finalScoreA},${stats.daA}\n${settings.playerB},${stats.finalScoreB},${stats.daB}`;
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "match-summary.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+
+</body>
+</html>
