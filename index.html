@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Legion Darts Scorer v2.5.1</title>
+<title>Legion Darts Scorer v2.6</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -24,11 +24,12 @@
     justify-content: center;
     height: 100vh;
   }
-  input {
+  input, select {
     padding: 10px;
     margin: 5px;
     border: none;
     border-radius: 5px;
+    font-size: 16px;
   }
   button {
     background: #2574a9;
@@ -88,6 +89,12 @@
     padding: 12px;
     background: #345a8a;
   }
+  #keypad button.active {
+    background: #ff4d4d;
+  }
+  #keypad button.doubleActive {
+    background: #2ecc71;
+  }
   #bottomRow {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -106,17 +113,43 @@
     font-size: 12px;
     opacity: 0.5;
   }
+  /* Overlay */
+  #winOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+  }
+  #winBox {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid #00ffae;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+  }
+  #winBox h2 { margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
-<div id="versionTag">v2.5.1</div>
+<div id="versionTag">v2.6</div>
 
 <!-- Start Screen -->
 <div id="startScreen">
   <h1>🎯 Legion Darts Scorer</h1>
   <input id="homeName" placeholder="Home name" />
   <input id="awayName" placeholder="Away name" />
+  <label for="bullWinner">Who won closest to bull?</label>
+  <select id="bullWinner">
+    <option value="home">Home</option>
+    <option value="away">Away</option>
+  </select>
   <button id="startGame">Start Game</button>
 </div>
 
@@ -129,7 +162,7 @@
       <div class="dart-row" id="darts1">
         <div class="dart">–</div><div class="dart">–</div><div class="dart">–</div>
       </div>
-      <div id="avg1">3DA: 0.00</div>
+      <div id="avg1">3DA: 0.00 | Throws: 0</div>
     </div>
     <div id="away" class="player">
       <h2>Away (P2)</h2>
@@ -137,15 +170,15 @@
       <div class="dart-row" id="darts2">
         <div class="dart">–</div><div class="dart">–</div><div class="dart">–</div>
       </div>
-      <div id="avg2">3DA: 0.00</div>
+      <div id="avg2">3DA: 0.00 | Throws: 0</div>
     </div>
   </div>
 
   <div id="message"></div>
 
   <div id="keypad">
-    <button data-action="D">D</button>
-    <button data-action="T">T</button>
+    <button data-action="D" id="doubleBtn">D</button>
+    <button data-action="T" id="trebleBtn">T</button>
     <button data-action="25">25</button>
     <button data-action="BULL">Bull</button>
     <button data-action="NS">No</button>
@@ -166,36 +199,71 @@
   <button id="submitTurn" style="margin-top:15px;background:#00ffae;color:#000;font-weight:bold;">Submit Turn</button>
 </div>
 
+<!-- Win Overlay -->
+<div id="winOverlay">
+  <div id="winBox">
+    <h2>🎯 Congratulations Sharp Shooter!</h2>
+    <div id="winStats"></div>
+    <button id="nextLeg">Next Leg</button>
+    <button id="newMatch">New Match</button>
+  </div>
+</div>
+
 <script>
 const startBtn=document.getElementById('startGame');
 const startScreen=document.getElementById('startScreen');
 const gameScreen=document.getElementById('gameScreen');
 const homeInput=document.getElementById('homeName');
 const awayInput=document.getElementById('awayName');
-
-startBtn.addEventListener('click',()=>{
-  document.querySelector('#home h2').textContent=`${homeInput.value||'Home'} (P1)`;
-  document.querySelector('#away h2').textContent=`${awayInput.value||'Away'} (P2)`;
-  startScreen.style.opacity='0';
-  setTimeout(()=>{startScreen.style.display='none';gameScreen.style.display='block';gameScreen.style.opacity='1';},600);
-});
+const bullSelect=document.getElementById('bullWinner');
 
 let scores=[501,501],active=0,multiplier=null;
 let currentDarts=[[],[]],allDarts=[[],[]];
+let totalThrows=[0,0];
+let legStarter=0;
+
 const scoreEls=[document.getElementById('score1'),document.getElementById('score2')];
 const dartEls=[document.getElementById('darts1'),document.getElementById('darts2')];
 const avgEls=[document.getElementById('avg1'),document.getElementById('avg2')];
 const msg=document.getElementById('message');
+
+function resetLeg() {
+  scores=[501,501];
+  currentDarts=[[],[]];
+  allDarts=[[],[]];
+  totalThrows=[0,0];
+  scoreEls.forEach((el,i)=>el.textContent=scores[i]);
+  avgEls.forEach((el)=>el.textContent="3DA: 0.00 | Throws: 0");
+  dartEls.forEach((el)=>el.querySelectorAll('.dart').forEach(d=>d.textContent='–'));
+  document.getElementById('winOverlay').style.display='none';
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('away').classList.remove('active');
+  document.getElementById(legStarter===0?'home':'away').classList.add('active');
+  active=legStarter;
+}
 
 function showMessage(t){msg.textContent=t;msg.style.display='block';setTimeout(()=>msg.style.display='none',1500);}
 function updateDarts(){for(let i=0;i<2;i++){const dset=dartEls[i].querySelectorAll('.dart');dset.forEach((d,j)=>{d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';});}}
 function switchPlayer(){document.getElementById('home').classList.toggle('active');document.getElementById('away').classList.toggle('active');active=1-active;}
 function calc3DA(i){const d=allDarts[i];if(!d.length)return'0.00';return((d.reduce((a,b)=>a+b,0)/d.length)*3).toFixed(2);}
 
+startBtn.addEventListener('click',()=>{
+  document.querySelector('#home h2').textContent=`${homeInput.value||'Home'} (P1)`;
+  document.querySelector('#away h2').textContent=`${awayInput.value||'Away'} (P2)`;
+  legStarter=bullSelect.value==='home'?0:1;
+  active=legStarter;
+  startScreen.style.opacity='0';
+  setTimeout(()=>{startScreen.style.display='none';gameScreen.style.display='block';gameScreen.style.opacity='1';},600);
+});
+
+const doubleBtn=document.getElementById('doubleBtn');
+const trebleBtn=document.getElementById('trebleBtn');
+
 document.getElementById('keypad').addEventListener('click',e=>{
   if(e.target.tagName!=='BUTTON')return;
   const act=e.target.dataset.action;
-  if(act==='D'||act==='T'){multiplier=act;return;}
+  if(act==='D'){multiplier='D';doubleBtn.classList.add('doubleActive');trebleBtn.classList.remove('active');return;}
+  if(act==='T'){multiplier='T';trebleBtn.classList.add('active');doubleBtn.classList.remove('doubleActive');return;}
   let val=0;
   if(act==='25')val=25;
   else if(act==='BULL')val=50;
@@ -206,6 +274,8 @@ document.getElementById('keypad').addEventListener('click',e=>{
   if(multiplier==='D')val*=2;
   if(multiplier==='T')val*=3;
   multiplier=null;
+  doubleBtn.classList.remove('doubleActive');
+  trebleBtn.classList.remove('active');
   if(currentDarts[active].length>=3)return;
   currentDarts[active].push(val);
   updateDarts();
@@ -213,7 +283,6 @@ document.getElementById('keypad').addEventListener('click',e=>{
 
 document.getElementById('undoDart').onclick=()=>{currentDarts[active].pop();updateDarts();};
 document.getElementById('undoTurn').onclick=()=>{currentDarts[active]=[];updateDarts();};
-
 document.getElementById('undoLast').onclick=()=>{
   switchPlayer();
   if(allDarts[active].length>0){
@@ -221,7 +290,7 @@ document.getElementById('undoLast').onclick=()=>{
     const restoredScore=scores[active]+lastTurn.reduce((a,b)=>a+b,0);
     scores[active]=restoredScore;
     scoreEls[active].textContent=restoredScore;
-    avgEls[active].textContent='3DA: '+calc3DA(active);
+    avgEls[active].textContent=`3DA: ${calc3DA(active)} | Throws: ${totalThrows[active]}`;
   }
   currentDarts[active]=[];
   updateDarts();
@@ -231,15 +300,35 @@ document.getElementById('undoLast').onclick=()=>{
 document.getElementById('submitTurn').onclick=()=>{
   const sum=currentDarts[active].reduce((a,b)=>a+b,0);
   const newScore=scores[active]-sum;
-  if(newScore<0){showMessage('BUST!');currentDarts[active]=[];updateDarts();switchPlayer();return;}
+  totalThrows[active]+=currentDarts[active].length;
+  if(newScore<0){showMessage('BUST!');totalThrows[active]-=currentDarts[active].length;currentDarts[active]=[];updateDarts();switchPlayer();return;}
   scores[active]=newScore;
   scoreEls[active].textContent=newScore;
   allDarts[active].push(...currentDarts[active]);
-  avgEls[active].textContent='3DA: '+calc3DA(active);
+  avgEls[active].textContent=`3DA: ${calc3DA(active)} | Throws: ${totalThrows[active]}`;
   currentDarts[active]=[];
   updateDarts();
-  if(newScore===0){showMessage('🎯 Game Shot!');return;}
+  if(newScore===0){
+    const winOverlay=document.getElementById('winOverlay');
+    const winStats=document.getElementById('winStats');
+    const loser=1-active;
+    winStats.innerHTML=`
+      <p><strong>Winner:</strong> ${active===0?homeInput.value||'Home':awayInput.value||'Away'}</p>
+      <p>${homeInput.value||'Home'} - 3DA: ${calc3DA(0)} | Throws: ${totalThrows[0]}</p>
+      <p>${awayInput.value||'Away'} - 3DA: ${calc3DA(1)} | Throws: ${totalThrows[1]}</p>
+    `;
+    winOverlay.style.display='flex';
+    return;
+  }
   switchPlayer();
+};
+
+document.getElementById('nextLeg').onclick=()=>{
+  legStarter=1-legStarter;
+  resetLeg();
+};
+document.getElementById('newMatch').onclick=()=>{
+  location.reload();
 };
 </script>
 </body>
