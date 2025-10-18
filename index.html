@@ -1,172 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Legion Darts Scorer v2.5.0</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Legion Darts Scorer v2.5.1</title>
 <style>
-:root {
-  --bg: #f5f9ff;
-  --fg: #002b5c;
-  --accent: #007bff;
-  --card: #ffffff;
-}
-body.dark {
-  --bg: #0d1117;
-  --fg: #e6edf3;
-  --accent: #58a6ff;
-  --card: #161b22;
-}
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--fg);
-  margin: 0;
-  text-align: center;
-  transition: background 0.3s, color 0.3s;
-}
-#darkToggle {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: var(--card);
-  color: var(--fg);
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8rem;
-}
-#startScreen, #gameScreen {
-  max-width: 480px;
-  margin: auto;
-  padding: 1rem;
-}
-#gameScreen {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-.card {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 1rem;
-  margin: 1rem 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-input {
-  padding: 0.5rem;
-  width: 80%;
-  margin: 0.3rem 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-button {
-  padding: 0.8rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
-}
-button:disabled {
-  opacity: 0.5;
-}
-#scoreboard {
-  display: flex;
-  justify-content: space-around;
-}
-.player {
-  flex: 1;
-  margin: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-}
-.player.active {
-  background: rgba(0,123,255,0.1);
-}
-.score {
-  font-size: 2.2rem;
-  margin: 0.3rem 0;
-}
-.avg {
-  font-size: 0.9rem;
-  color: var(--accent);
-}
-.dart-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-}
-.dart {
-  width: 2.2rem;
-  height: 2.2rem;
-  line-height: 2.2rem;
-  border-radius: 5px;
-  background: var(--card);
-  border: 1px solid #ccc;
-}
-#keypad {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-#controls {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-  margin-top: 0.8rem;
-}
-#message {
-  font-weight: bold;
-  margin-top: 0.5rem;
-  display: none;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #0a1630, #1e3a5f);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    overflow-x: hidden;
+  }
+  #startScreen, #gameScreen {
+    transition: opacity 0.6s ease;
+  }
+  #startScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  input {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+  }
+  button {
+    background: #2574a9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 18px;
+    font-size: 18px;
+    margin: 5px;
+  }
+  button:active {
+    transform: scale(0.97);
+  }
+  #gameScreen {
+    display: none;
+    opacity: 0;
+    padding: 10px;
+  }
+  .players {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 10px;
+  }
+  .player {
+    width: 45%;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .active {
+    border: 2px solid #00ffae;
+  }
+  .score {
+    font-size: 36px;
+    font-weight: bold;
+  }
+  .dart-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 8px;
+  }
+  .dart {
+    background: rgba(255,255,255,0.1);
+    padding: 5px 10px;
+    border-radius: 4px;
+    min-width: 25px;
+  }
+  #keypad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 20px 5px;
+  }
+  #keypad button {
+    font-size: 20px;
+    padding: 12px;
+    background: #345a8a;
+  }
+  #bottomRow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  #message {
+    display: none;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+  #versionTag {
+    position: fixed;
+    top: 8px;
+    right: 10px;
+    font-size: 12px;
+    opacity: 0.5;
+  }
 </style>
 </head>
 <body>
 
-<button id="darkToggle">☀️</button>
+<div id="versionTag">v2.5.1</div>
 
-<!-- START SCREEN -->
-<div id="startScreen" class="card">
+<!-- Start Screen -->
+<div id="startScreen">
   <h1>🎯 Legion Darts Scorer</h1>
-  <input id="homeName" placeholder="Home Player Name"><br>
-  <input id="awayName" placeholder="Away Player Name"><br>
-  <label>Best of: <input id="bestOf" type="number" min="1" max="9" value="3" style="width:50px"></label><br><br>
+  <input id="homeName" placeholder="Home name" />
+  <input id="awayName" placeholder="Away name" />
   <button id="startGame">Start Game</button>
-  <p style="margin-top:1rem;font-size:0.8rem;">Version v2.5.0</p>
 </div>
 
-<!-- GAME SCREEN -->
+<!-- Game Screen -->
 <div id="gameScreen">
-  <div id="scoreboard" class="card">
-    <div class="player active" id="home">
+  <div class="players">
+    <div id="home" class="player active">
       <h2>Home (P1)</h2>
       <div class="score" id="score1">501</div>
-      <div class="avg" id="avg1">3DA: 0.00</div>
       <div class="dart-row" id="darts1">
-        <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
+        <div class="dart">–</div><div class="dart">–</div><div class="dart">–</div>
       </div>
+      <div id="avg1">3DA: 0.00</div>
     </div>
-    <div class="player" id="away">
+    <div id="away" class="player">
       <h2>Away (P2)</h2>
       <div class="score" id="score2">501</div>
-      <div class="avg" id="avg2">3DA: 0.00</div>
       <div class="dart-row" id="darts2">
-        <div class="dart empty">–</div><div class="dart empty">–</div><div class="dart empty">–</div>
+        <div class="dart">–</div><div class="dart">–</div><div class="dart">–</div>
       </div>
+      <div id="avg2">3DA: 0.00</div>
     </div>
   </div>
 
-  <div id="keypad" class="card">
+  <div id="message"></div>
+
+  <div id="keypad">
     <button data-action="D">D</button>
     <button data-action="T">T</button>
     <button data-action="25">25</button>
     <button data-action="BULL">Bull</button>
-    <button data-action="NS">No Score</button>
+    <button data-action="NS">No</button>
 
     <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
     <button>6</button><button>7</button><button>8</button><button>9</button><button>10</button>
@@ -174,26 +156,17 @@ button:disabled {
     <button>16</button><button>17</button><button>18</button><button>19</button><button>20</button>
   </div>
 
-  <div id="controls">
-    <button id="statsBtn">📊</button>
-    <button id="undoDart">↩️ Dart</button>
-    <button id="undoTurn">↩️ Turn</button>
-    <button id="undoLast">↩️ Prev</button>
+  <div id="bottomRow">
+    <button id="undoDart">↩️ Undo Dart</button>
+    <button id="undoTurn">↩️ Undo Turn</button>
+    <button id="undoLast">↩️ Prev Turn</button>
+    <button id="coin">🪙</button>
   </div>
 
-  <button id="submitTurn" style="margin-top:0.8rem;width:90%;max-width:400px;">Submit Turn</button>
-  <div id="message"></div>
+  <button id="submitTurn" style="margin-top:15px;background:#00ffae;color:#000;font-weight:bold;">Submit Turn</button>
 </div>
 
 <script>
-// ---------- DARK MODE ----------
-const darkToggle=document.getElementById('darkToggle');
-darkToggle.onclick=()=>{
-  document.body.classList.toggle('dark');
-  darkToggle.textContent=document.body.classList.contains('dark')?'🌙':'☀️';
-};
-
-// ---------- START SCREEN ----------
 const startBtn=document.getElementById('startGame');
 const startScreen=document.getElementById('startScreen');
 const gameScreen=document.getElementById('gameScreen');
@@ -201,61 +174,24 @@ const homeInput=document.getElementById('homeName');
 const awayInput=document.getElementById('awayName');
 
 startBtn.addEventListener('click',()=>{
-  const homeName=homeInput.value||'Home';
-  const awayName=awayInput.value||'Away';
-  document.querySelector('#home h2').textContent=`${homeName} (P1)`;
-  document.querySelector('#away h2').textContent=`${awayName} (P2)`;
+  document.querySelector('#home h2').textContent=`${homeInput.value||'Home'} (P1)`;
+  document.querySelector('#away h2').textContent=`${awayInput.value||'Away'} (P2)`;
   startScreen.style.opacity='0';
-  setTimeout(()=>{
-    startScreen.style.display='none';
-    gameScreen.style.display='block';
-    gameScreen.style.opacity='1';
-  },500);
+  setTimeout(()=>{startScreen.style.display='none';gameScreen.style.display='block';gameScreen.style.opacity='1';},600);
 });
 
-// ---------- GAME LOGIC ----------
-let scores=[501,501];
-let active=0;
-let currentDarts=[[],[]];
-let allDarts=[[],[]];
-let multiplier=null;
+let scores=[501,501],active=0,multiplier=null;
+let currentDarts=[[],[]],allDarts=[[],[]];
 const scoreEls=[document.getElementById('score1'),document.getElementById('score2')];
 const dartEls=[document.getElementById('darts1'),document.getElementById('darts2')];
 const avgEls=[document.getElementById('avg1'),document.getElementById('avg2')];
 const msg=document.getElementById('message');
 
-function showMessage(text){
-  msg.textContent=text;
-  msg.style.display='block';
-  setTimeout(()=>msg.style.display='none',2000);
-}
-function updateDarts(){
-  for(let i=0;i<2;i++){
-    const dset=dartEls[i].querySelectorAll('.dart');
-    dset.forEach((d,j)=>{
-      d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';
-      d.classList.toggle('empty',currentDarts[i][j]===undefined);
-    });
-  }
-}
-function switchPlayer(){
-  document.getElementById('home').classList.toggle('active');
-  document.getElementById('away').classList.toggle('active');
-  active=1-active;
-}
-function calc3DA(i){
-  let thrown=allDarts[i];
-  if(!thrown.length)return '3DA: 0.00';
-  let total=thrown.reduce((a,b)=>a+b,0);
-  return '3DA: '+(total/thrown.length*3).toFixed(2);
-}
-function addDart(value){
-  if(currentDarts[active].length>=3)return;
-  currentDarts[active].push(value);
-  updateDarts();
-}
+function showMessage(t){msg.textContent=t;msg.style.display='block';setTimeout(()=>msg.style.display='none',1500);}
+function updateDarts(){for(let i=0;i<2;i++){const dset=dartEls[i].querySelectorAll('.dart');dset.forEach((d,j)=>{d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';});}}
+function switchPlayer(){document.getElementById('home').classList.toggle('active');document.getElementById('away').classList.toggle('active');active=1-active;}
+function calc3DA(i){const d=allDarts[i];if(!d.length)return'0.00';return((d.reduce((a,b)=>a+b,0)/d.length)*3).toFixed(2);}
 
-// keypad input
 document.getElementById('keypad').addEventListener('click',e=>{
   if(e.target.tagName!=='BUTTON')return;
   const act=e.target.dataset.action;
@@ -265,59 +201,46 @@ document.getElementById('keypad').addEventListener('click',e=>{
   else if(act==='BULL')val=50;
   else if(act==='NS')val=0;
   else val=parseInt(e.target.textContent);
-  // prevent invalid multipliers for bull/25
-  if((act==='25'||act==='BULL') && multiplier){multiplier=null;}
+
+  if((act==='25'||act==='BULL')&&(multiplier==='D'||multiplier==='T'))multiplier=null;
   if(multiplier==='D')val*=2;
   if(multiplier==='T')val*=3;
   multiplier=null;
-  addDart(val);
+  if(currentDarts[active].length>=3)return;
+  currentDarts[active].push(val);
+  updateDarts();
 });
 
-document.getElementById('undoDart').onclick=()=>{
-  currentDarts[active].pop();
-  updateDarts();
-};
-document.getElementById('undoTurn').onclick=()=>{
-  currentDarts[active]=[];
-  updateDarts();
-};
+document.getElementById('undoDart').onclick=()=>{currentDarts[active].pop();updateDarts();};
+document.getElementById('undoTurn').onclick=()=>{currentDarts[active]=[];updateDarts();};
+
 document.getElementById('undoLast').onclick=()=>{
   switchPlayer();
+  if(allDarts[active].length>0){
+    const lastTurn=allDarts[active].splice(-3);
+    const restoredScore=scores[active]+lastTurn.reduce((a,b)=>a+b,0);
+    scores[active]=restoredScore;
+    scoreEls[active].textContent=restoredScore;
+    avgEls[active].textContent='3DA: '+calc3DA(active);
+  }
   currentDarts[active]=[];
   updateDarts();
+  showMessage('↩️ Last turn undone');
 };
 
 document.getElementById('submitTurn').onclick=()=>{
   const sum=currentDarts[active].reduce((a,b)=>a+b,0);
   const newScore=scores[active]-sum;
-  if(newScore<0){
-    showMessage('BUST!');
-    currentDarts[active]=[];
-    updateDarts();
-    switchPlayer();
-    return;
-  }
-  if(newScore===0){
-    showMessage('🎯 Game Shot!');
-    scores[active]=0;
-    scoreEls[active].textContent=0;
-    allDarts[active].push(...currentDarts[active]);
-    avgEls[active].textContent=calc3DA(active);
-    currentDarts[active]=[];
-    updateDarts();
-    return; // stop switching players, leg done
-  }
+  if(newScore<0){showMessage('BUST!');currentDarts[active]=[];updateDarts();switchPlayer();return;}
   scores[active]=newScore;
-  scoreEls[active].textContent=scores[active];
+  scoreEls[active].textContent=newScore;
   allDarts[active].push(...currentDarts[active]);
-  avgEls[active].textContent=calc3DA(active);
+  avgEls[active].textContent='3DA: '+calc3DA(active);
   currentDarts[active]=[];
   updateDarts();
+  if(newScore===0){showMessage('🎯 Game Shot!');return;}
   switchPlayer();
 };
-
-// ---------- STATS BUTTON ----------
-document.getElementById('statsBtn').onclick=()=>showMessage('📊 Stats coming soon');
 </script>
 </body>
 </html>
