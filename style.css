@@ -30,6 +30,14 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
+/* --- Layout Sections --- */
+section {
+  width: 100%;
+  max-width: 600px;
+  padding: 0.5rem 0;
+}
+
+/* --- Icons at top --- */
 .top-icons {
   display: flex;
   justify-content: center;
@@ -43,23 +51,25 @@ body {
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease;
+  color: var(--accent);
 }
 
 .icon-btn:hover {
   transform: scale(1.1);
 }
 
+/* --- Scoreboard --- */
 .scoreboard {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 90%;
   margin-top: 0.5rem;
 }
 
 .player {
   flex: 1;
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.8);
   border-radius: 12px;
   padding: 0.8rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -67,11 +77,13 @@ body {
 }
 
 body.dark .player {
-  background: rgba(30,30,30,0.7);
+  background: rgba(30,30,30,0.8);
 }
 
 .player h2 {
   margin: 0.3rem 0;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .score {
@@ -92,6 +104,7 @@ body.dark .player {
   min-height: 1.2rem;
 }
 
+/* --- Keypad Section --- */
 .keypad {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -100,7 +113,9 @@ body.dark .player {
   margin-top: 1rem;
 }
 
-.keypad button, .controls button {
+.keypad button,
+.controls button,
+.numbers button {
   font-size: 1rem;
   padding: 0.6rem;
   border: none;
@@ -109,29 +124,41 @@ body.dark .player {
   color: var(--fg);
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
+  box-sizing: border-box;
 }
 
-.keypad button:hover, .controls button:hover {
+.keypad button:hover,
+.controls button:hover,
+.numbers button:hover {
   background: var(--button-hover);
   transform: scale(1.03);
 }
 
+/* --- Glow effects for active D/T --- */
 #doubleBtn.active {
-  box-shadow: 0 0 10px 3px rgba(0,123,255,0.6);
+  box-shadow: 0 0 12px 3px rgba(0,123,255,0.7);
 }
 
 #trebleBtn.active {
-  box-shadow: 0 0 10px 3px rgba(255,0,0,0.6);
+  box-shadow: 0 0 12px 3px rgba(255,0,0,0.6);
 }
 
+/* --- Number buttons larger --- */
 .numbers {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0.4rem;
   width: 90%;
-  margin-top: 0.6rem;
+  margin-top: 0.8rem;
 }
 
+.numbers button {
+  height: 80px;  /* twice the original height */
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* --- Control buttons --- */
 .controls {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -140,6 +167,7 @@ body.dark .player {
   margin: 1rem 0;
 }
 
+/* --- Tooltip --- */
 .tooltip {
   position: fixed;
   background: var(--accent);
@@ -157,6 +185,7 @@ body.dark .player {
   opacity: 1;
 }
 
+/* --- Modal --- */
 .modal {
   position: fixed;
   top: 0; left: 0;
@@ -193,6 +222,7 @@ body.dark .player {
   margin-top: 0.5rem;
 }
 
+/* --- Footer --- */
 footer {
   font-size: 0.75rem;
   margin-bottom: 0.5rem;
@@ -207,3 +237,8 @@ footer {
   font-size: 1.2rem;
   color: var(--accent);
 }
+
+/* --- Section spacing --- */
+section:nth-of-type(1) { margin-top: 0.5rem; }
+section:nth-of-type(2) { margin-top: 1rem; }
+section:nth-of-type(3) { margin-top: 1.5rem; }
