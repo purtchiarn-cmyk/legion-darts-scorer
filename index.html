@@ -3,20 +3,79 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Legion Darts Scorer v2.6</title>
+<title>Legion Darts Scorer v2.7</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --red: #e63946;
+    --blue: #457b9d;
+    --yellow: #ffb703;
+    --cream: #f9f9f4;
+    --dark-bg: #121212;
+    --dark-card: #1f1f1f;
+    --text-dark: #111;
+    --text-light: #f9f9f4;
+  }
+
   body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(180deg, #0a1630, #1e3a5f);
-    color: #fff;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
     text-align: center;
-    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
   }
+
+  body.light {
+    background: var(--cream);
+    color: var(--text-dark);
+  }
+
+  body.dark {
+    background: var(--dark-bg);
+    color: var(--text-light);
+  }
+
+  h1, h2 { margin: 10px 0; }
+
+  input, select, button {
+    font-family: inherit;
+    border-radius: 6px;
+    font-size: 16px;
+    border: none;
+    padding: 10px;
+  }
+
+  input, select {
+    background: rgba(255,255,255,0.9);
+    margin: 5px;
+  }
+
+  button {
+    cursor: pointer;
+    margin: 5px;
+    transition: transform 0.1s ease, background 0.2s;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  #themeToggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: var(--blue);
+    color: white;
+    font-size: 12px;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+
   #startScreen, #gameScreen {
     transition: opacity 0.6s ease;
   }
+
   #startScreen {
     display: flex;
     flex-direction: column;
@@ -24,95 +83,93 @@
     justify-content: center;
     height: 100vh;
   }
-  input, select {
-    padding: 10px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  button {
-    background: #2574a9;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 18px;
-    font-size: 18px;
-    margin: 5px;
-  }
-  button:active {
-    transform: scale(0.97);
-  }
+
   #gameScreen {
     display: none;
     opacity: 0;
     padding: 10px;
   }
+
   .players {
     display: flex;
     justify-content: space-evenly;
     margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
+
   .player {
     width: 45%;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
     padding: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    transition: border 0.3s;
   }
+
+  body.light .player {
+    background: #fff;
+  }
+
   .active {
-    border: 2px solid #00ffae;
+    border: 3px solid var(--yellow);
   }
+
   .score {
     font-size: 36px;
-    font-weight: bold;
+    font-weight: 600;
   }
+
   .dart-row {
     display: flex;
     justify-content: center;
     gap: 5px;
     margin-top: 8px;
   }
+
   .dart {
     background: rgba(255,255,255,0.1);
     padding: 5px 10px;
     border-radius: 4px;
     min-width: 25px;
   }
+
   #keypad {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     margin: 20px 5px;
   }
+
   #keypad button {
-    font-size: 20px;
-    padding: 12px;
-    background: #345a8a;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 600;
   }
-  #keypad button.active {
-    background: #ff4d4d;
-  }
-  #keypad button.doubleActive {
-    background: #2ecc71;
-  }
+
+  #keypad button.active { background: var(--red); }
+  #keypad button.doubleActive { background: var(--yellow); color: #111; }
+
   #bottomRow {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     margin-top: 10px;
   }
-  #message {
-    display: none;
+
+  #submitTurn {
+    background: var(--yellow);
+    color: #111;
     font-weight: bold;
-    margin-top: 5px;
   }
+
   #versionTag {
     position: fixed;
-    top: 8px;
+    top: 10px;
     right: 10px;
     font-size: 12px;
-    opacity: 0.5;
+    opacity: 0.6;
   }
+
   /* Overlay */
   #winOverlay {
     position: fixed;
@@ -124,21 +181,24 @@
     background: rgba(0,0,0,0.4);
     z-index: 100;
   }
+
   #winBox {
     background: rgba(255,255,255,0.15);
-    border: 2px solid #00ffae;
+    border: 2px solid var(--yellow);
     border-radius: 10px;
     padding: 20px;
     text-align: center;
     width: 80%;
     max-width: 400px;
   }
+
   #winBox h2 { margin-bottom: 10px; }
 </style>
 </head>
-<body>
+<body class="light">
 
-<div id="versionTag">v2.6</div>
+<button id="themeToggle">🌙 Dark</button>
+<div id="versionTag">v2.7</div>
 
 <!-- Start Screen -->
 <div id="startScreen">
@@ -156,25 +216,19 @@
 <!-- Game Screen -->
 <div id="gameScreen">
   <div class="players">
-    <div id="home" class="player active">
+    <div id="home" class="player">
       <h2>Home (P1)</h2>
       <div class="score" id="score1">501</div>
-      <div class="dart-row" id="darts1">
-        <div class="dart">–</div><div class="dart">–</div><div class="dart">–</div>
-      </div>
+      <div class="dart-row" id="darts1"><div class="dart">–</div><div class="dart">–</div><div class="dart">–</div></div>
       <div id="avg1">3DA: 0.00 | Throws: 0</div>
     </div>
     <div id="away" class="player">
       <h2>Away (P2)</h2>
       <div class="score" id="score2">501</div>
-      <div class="dart-row" id="darts2">
-        <div class="dart">–</div><div class="dart">–</div><div class="dart">–</div>
-      </div>
+      <div class="dart-row" id="darts2"><div class="dart">–</div><div class="dart">–</div><div class="dart">–</div></div>
       <div id="avg2">3DA: 0.00 | Throws: 0</div>
     </div>
   </div>
-
-  <div id="message"></div>
 
   <div id="keypad">
     <button data-action="D" id="doubleBtn">D</button>
@@ -182,7 +236,6 @@
     <button data-action="25">25</button>
     <button data-action="BULL">Bull</button>
     <button data-action="NS">No</button>
-
     <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
     <button>6</button><button>7</button><button>8</button><button>9</button><button>10</button>
     <button>11</button><button>12</button><button>13</button><button>14</button><button>15</button>
@@ -196,7 +249,7 @@
     <button id="coin">🪙</button>
   </div>
 
-  <button id="submitTurn" style="margin-top:15px;background:#00ffae;color:#000;font-weight:bold;">Submit Turn</button>
+  <button id="submitTurn">Submit Turn</button>
 </div>
 
 <!-- Win Overlay -->
@@ -216,6 +269,7 @@ const gameScreen=document.getElementById('gameScreen');
 const homeInput=document.getElementById('homeName');
 const awayInput=document.getElementById('awayName');
 const bullSelect=document.getElementById('bullWinner');
+const themeToggle=document.getElementById('themeToggle');
 
 let scores=[501,501],active=0,multiplier=null;
 let currentDarts=[[],[]],allDarts=[[],[]];
@@ -225,16 +279,15 @@ let legStarter=0;
 const scoreEls=[document.getElementById('score1'),document.getElementById('score2')];
 const dartEls=[document.getElementById('darts1'),document.getElementById('darts2')];
 const avgEls=[document.getElementById('avg1'),document.getElementById('avg2')];
-const msg=document.getElementById('message');
 
-function resetLeg() {
+function resetLeg(){
   scores=[501,501];
   currentDarts=[[],[]];
   allDarts=[[],[]];
   totalThrows=[0,0];
   scoreEls.forEach((el,i)=>el.textContent=scores[i]);
-  avgEls.forEach((el)=>el.textContent="3DA: 0.00 | Throws: 0");
-  dartEls.forEach((el)=>el.querySelectorAll('.dart').forEach(d=>d.textContent='–'));
+  avgEls.forEach(el=>el.textContent="3DA: 0.00 | Throws: 0");
+  dartEls.forEach(el=>el.querySelectorAll('.dart').forEach(d=>d.textContent='–'));
   document.getElementById('winOverlay').style.display='none';
   document.getElementById('home').classList.remove('active');
   document.getElementById('away').classList.remove('active');
@@ -242,16 +295,32 @@ function resetLeg() {
   active=legStarter;
 }
 
-function showMessage(t){msg.textContent=t;msg.style.display='block';setTimeout(()=>msg.style.display='none',1500);}
-function updateDarts(){for(let i=0;i<2;i++){const dset=dartEls[i].querySelectorAll('.dart');dset.forEach((d,j)=>{d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';});}}
-function switchPlayer(){document.getElementById('home').classList.toggle('active');document.getElementById('away').classList.toggle('active');active=1-active;}
-function calc3DA(i){const d=allDarts[i];if(!d.length)return'0.00';return((d.reduce((a,b)=>a+b,0)/d.length)*3).toFixed(2);}
+function updateDarts(){
+  for(let i=0;i<2;i++){
+    const dset=dartEls[i].querySelectorAll('.dart');
+    dset.forEach((d,j)=>{d.textContent=currentDarts[i][j]!==undefined?currentDarts[i][j]:'–';});
+  }
+}
+function switchPlayer(){
+  document.getElementById('home').classList.toggle('active');
+  document.getElementById('away').classList.toggle('active');
+  active=1-active;
+}
+function calc3DA(i){
+  const d=allDarts[i];
+  if(!d.length)return'0.00';
+  return((d.reduce((a,b)=>a+b,0)/d.length)*3).toFixed(2);
+}
 
 startBtn.addEventListener('click',()=>{
   document.querySelector('#home h2').textContent=`${homeInput.value||'Home'} (P1)`;
   document.querySelector('#away h2').textContent=`${awayInput.value||'Away'} (P2)`;
   legStarter=bullSelect.value==='home'?0:1;
   active=legStarter;
+  // ✅ FIX highlight correct starting player
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('away').classList.remove('active');
+  document.getElementById(active===0?'home':'away').classList.add('active');
   startScreen.style.opacity='0';
   setTimeout(()=>{startScreen.style.display='none';gameScreen.style.display='block';gameScreen.style.opacity='1';},600);
 });
@@ -269,7 +338,6 @@ document.getElementById('keypad').addEventListener('click',e=>{
   else if(act==='BULL')val=50;
   else if(act==='NS')val=0;
   else val=parseInt(e.target.textContent);
-
   if((act==='25'||act==='BULL')&&(multiplier==='D'||multiplier==='T'))multiplier=null;
   if(multiplier==='D')val*=2;
   if(multiplier==='T')val*=3;
@@ -294,14 +362,13 @@ document.getElementById('undoLast').onclick=()=>{
   }
   currentDarts[active]=[];
   updateDarts();
-  showMessage('↩️ Last turn undone');
 };
 
 document.getElementById('submitTurn').onclick=()=>{
   const sum=currentDarts[active].reduce((a,b)=>a+b,0);
   const newScore=scores[active]-sum;
   totalThrows[active]+=currentDarts[active].length;
-  if(newScore<0){showMessage('BUST!');totalThrows[active]-=currentDarts[active].length;currentDarts[active]=[];updateDarts();switchPlayer();return;}
+  if(newScore<0){currentDarts[active]=[];updateDarts();switchPlayer();return;}
   scores[active]=newScore;
   scoreEls[active].textContent=newScore;
   allDarts[active].push(...currentDarts[active]);
@@ -311,7 +378,6 @@ document.getElementById('submitTurn').onclick=()=>{
   if(newScore===0){
     const winOverlay=document.getElementById('winOverlay');
     const winStats=document.getElementById('winStats');
-    const loser=1-active;
     winStats.innerHTML=`
       <p><strong>Winner:</strong> ${active===0?homeInput.value||'Home':awayInput.value||'Away'}</p>
       <p>${homeInput.value||'Home'} - 3DA: ${calc3DA(0)} | Throws: ${totalThrows[0]}</p>
@@ -323,13 +389,18 @@ document.getElementById('submitTurn').onclick=()=>{
   switchPlayer();
 };
 
-document.getElementById('nextLeg').onclick=()=>{
-  legStarter=1-legStarter;
-  resetLeg();
-};
-document.getElementById('newMatch').onclick=()=>{
-  location.reload();
-};
+document.getElementById('nextLeg').onclick=()=>{legStarter=1-legStarter;resetLeg();};
+document.getElementById('newMatch').onclick=()=>{location.reload();};
+
+themeToggle.addEventListener('click',()=>{
+  if(document.body.classList.contains('light')){
+    document.body.classList.replace('light','dark');
+    themeToggle.textContent='☀️ Light';
+  } else {
+    document.body.classList.replace('dark','light');
+    themeToggle.textContent='🌙 Dark';
+  }
+});
 </script>
 </body>
 </html>
