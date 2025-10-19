@@ -1,120 +1,542 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Darts Checkout Scorer</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Legion Darts Scorer v2.8</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  input { width: 60px; }
-  #overlay {
-    display: none;
-    position: fixed;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff8c4;
-    padding: 20px;
-    border: 2px solid #333;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    z-index: 1000;
-  }
-  #overlay h3 { margin-top: 0; }
-  .scorer-section { margin-bottom: 15px; }
+:root{
+  --red:#e63946; --blue:#457b9d; --yellow:#ffb703; --black:#111;
+  --cream:#f7f4ef; --card:#ffffff;
+  --muted:#6b6b6b;
+  --gap:12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased}
+body.light{background:var(--cream);color:var(--black)}
+body.dark{background:#0b0b0d;color:#eee}
+
+/* app shell */
+.app{max-width:520px;margin:0 auto;padding:14px;height:100vh;display:flex;flex-direction:column;gap:var(--gap)}
+
+/* header */
+.header{display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:700;letter-spacing:0.6px}
+.controls{display:flex;gap:8px;align-items:center}
+.small{font-size:12px;color:var(--muted)}
+
+/* start screen card */
+.startCard{margin-top:6vh;background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,8,23,0.06)}
+.inputRow{display:flex;gap:8px;flex-direction:column}
+.inputRow input, .inputRow select{padding:10px;border-radius:8px;border:1px solid rgba(2,8,23,0.06);font-size:15px}
+
+/* main layout areas */
+.top{height:28%;display:flex;gap:12px;align-items:flex-start}
+.player{flex:1;background:var(--card);border-radius:12px;padding:12px;position:relative;min-width:140px;display:flex;flex-direction:column;gap:8px;box-shadow:0 6px 20px rgba(2,8,23,0.06)}
+.player h3{margin:0;font-size:14px;color:var(--blue)}
+.score{font-size:34px;font-weight:700}
+.dartsRow{display:flex;gap:8px;justify-content:center}
+.dartChip{min-width:56px;padding:8px;border-radius:10px;background:linear-gradient(180deg,#fff,#f2f8ff);text-align:center;font-weight:700;color:var(--black)}
+.dartChip.empty{opacity:0.45;background:transparent;border:1px dashed rgba(2,8,23,0.06)}
+.statsLine{font-size:13px;color:var(--muted)}
+
+/* active highlight */
+.player.active{outline:4px solid rgba(255,183,3,0.14);box-shadow:0 12px 36px rgba(11,102,255,0.06)}
+
+/* middle keypad */
+.middle{flex:1;display:flex;flex-direction:column;gap:10px}
+.labels{display:flex;justify-content:center;gap:12px;font-weight:600;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.btn{padding:12px;border-radius:10px;border:0;cursor:pointer;font-weight:700;background:#e6eef6;color:var(--black)}
+.btn:active{transform:translateY(1px)}
+.btn.special{background:linear-gradient(180deg,#fff6e6,#fff);color:var(--black)}
+.btn.active{background:var(--red);color:#fff}
+.btn.doubleActive{background:var(--yellow);color:#111}
+
+/* bottom controls */
+.bottom{height:15%;display:flex;flex-direction:column;gap:8px}
+.controlsRow{display:flex;gap:8px}
+.ctrl{flex:1;padding:10px;border-radius:10px;border:0;cursor:pointer;background:#f0f0f0}
+.submit{background:var(--yellow);color:#111;font-weight:800;border-radius:10px;padding:12px}
+
+/* overlays */
+.modalBack{position:fixed;inset:0;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);background:rgba(0,0,0,0.35);z-index:200}
+.modalCard{background:linear-gradient(180deg,rgba(255,255,255,0.95),#fff);padding:18px;border-radius:12px;max-width:420px;width:88%;text-align:left}
+.modalCard h2{margin-top:0}
+.closeX{position:absolute;right:14px;top:12px;border:0;background:none;font-size:18px;cursor:pointer}
+
+/* small responsive */
+@media (max-width:420px){
+  .top{flex-direction:row}
+  .player{padding:10px}
+  .score{font-size:28px}
+  .btn{padding:10px;font-size:15px}
+}
+.version{font-size:12px;color:var(--muted)}
 </style>
 </head>
-<body>
+<body class="light">
+<div class="app">
 
-<h1>Darts Checkout Scorer</h1>
-<p>Current Score: <input type="number" id="score" value="180"></p>
-<button id="checkoutButton">Check Checkout</button>
+  <div class="header">
+    <div class="brand">Legion Darts <span class="small">v2.8</span></div>
+    <div class="controls">
+      <button id="statsBtn" title="Stats">📊</button>
+      <button id="themeToggle" title="Theme">🌙</button>
+    </div>
+  </div>
 
-<!-- Original scorer text area -->
-<div id="scorerText">
-  <!-- This can hold your existing scorer output -->
-  <p>Your current scorer text will appear here.</p>
+  <!-- START SCREEN -->
+  <div id="startScreen" class="startCard" role="region" aria-label="Start Match">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h1 style="margin:0">🎯 Start Match</h1>
+      <div class="version">v2.8</div>
+    </div>
+    <div class="inputRow" style="margin-top:10px">
+      <input id="homeName" placeholder="Home name (P1)"/>
+      <input id="awayName" placeholder="Away name (P2)"/>
+      <label style="font-weight:600;color:var(--muted)">Who won closest to bull?</label>
+      <select id="bullWinner" style="padding:10px;border-radius:8px">
+        <option value="home">Home</option>
+        <option value="away">Away</option>
+      </select>
+      <div style="display:flex;justify-content:flex-end">
+        <button id="startBtn" style="background:var(--blue);color:#fff">Start Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SCREEN -->
+  <div id="main" style="display:none;flex-direction:column;gap:var(--gap)">
+
+    <!-- TOP: Scoreboard -->
+    <div class="top" role="region" aria-label="Scoreboard">
+      <div id="playerHome" class="player">
+        <h3 id="homeLabel">Home (P1)</h3>
+        <div class="score" id="homeScore">501</div>
+        <div class="dartsRow" id="homeChips">
+          <div class="dartChip empty" data-index="0">D1</div>
+          <div class="dartChip empty" data-index="1">D2</div>
+          <div class="dartChip empty" data-index="2">D3</div>
+        </div>
+        <div class="statsLine" id="homeStats">3DA: 0.00 | Throws: 0<br>First9: - | 18: - | 27: - | 36+: -</div>
+      </div>
+
+      <div id="playerAway" class="player">
+        <h3 id="awayLabel">Away (P2)</h3>
+        <div class="score" id="awayScore">501</div>
+        <div class="dartsRow" id="awayChips">
+          <div class="dartChip empty" data-index="0">D1</div>
+          <div class="dartChip empty" data-index="1">D2</div>
+          <div class="dartChip empty" data-index="2">D3</div>
+        </div>
+        <div class="statsLine" id="awayStats">3DA: 0.00 | Throws: 0<br>First9: - | 18: - | 27: - | 36+: -</div>
+      </div>
+    </div>
+
+    <!-- MIDDLE: keypad -->
+    <div class="middle">
+      <div class="labels"><div>1</div><div>2</div><div>3</div></div>
+
+      <div id="keypad" class="grid" role="region" aria-label="Dart keypad">
+        <button class="btn" data-act="D" id="btnD">D</button>
+        <button class="btn" data-num="1">1</button><button class="btn" data-num="2">2</button><button class="btn" data-num="3">3</button><button class="btn" data-num="4">4</button>
+
+        <button class="btn" data-act="T" id="btnT">T</button>
+        <button class="btn" data-num="5">5</button><button class="btn" data-num="6">6</button><button class="btn" data-num="7">7</button><button class="btn" data-num="8">8</button>
+
+        <button class="btn special" data-act="25">25</button>
+        <button class="btn" data-num="9">9</button><button class="btn" data-num="10">10</button><button class="btn" data-num="11">11</button><button class="btn" data-num="12">12</button>
+
+        <button class="btn special" data-act="BULL">Bull</button>
+        <button class="btn" data-num="13">13</button><button class="btn" data-num="14">14</button><button class="btn" data-num="15">15</button><button class="btn" data-num="16">16</button>
+
+        <button class="btn special" data-act="NS">No</button>
+        <button class="btn" data-num="17">17</button><button class="btn" data-num="18">18</button><button class="btn" data-num="19">19</button><button class="btn" data-num="20">20</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM: controls -->
+    <div class="bottom">
+      <div class="controlsRow">
+        <button id="undoD" class="ctrl">↩️ Undo Dart</button>
+        <button id="undoTurn" class="ctrl">↩️ Undo Turn</button>
+        <button id="undoLast" class="ctrl">↩️ Undo Last</button>
+        <button id="coin" class="ctrl">🪙</button>
+      </div>
+      <div style="display:flex;justify-content:center">
+        <button id="submit" class="submit">Submit Turn</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- Overlay for checkout options -->
-<div id="overlay"></div>
+<!-- STATS MODAL (centered blur) -->
+<div id="statsModal" class="modalBack" aria-hidden="true">
+  <div class="modalCard">
+    <button id="closeStats" class="closeX">✖</button>
+    <h2>Match Stats (current leg)</h2>
+    <div id="statsContent" style="font-size:14px;color:var(--black)"></div>
+  </div>
+</div>
+
+<!-- WIN OVERLAY (re-use modal style) -->
+<div id="winModal" class="modalBack" aria-hidden="true">
+  <div class="modalCard">
+    <h2>🎯 Congratulations — Sharp Shooter!</h2>
+    <div id="winContent"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+      <button id="nextLeg" style="background:var(--blue);color:#fff">Next Leg</button>
+      <button id="newMatch" style="background:var(--red);color:#fff">New Match</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// ----- Example static 3-dart and 2-dart checkout combos -----
-const threeDartCheckout = {
-  170: ["T20, T20, Bull"],
-  167: ["T20, T19, Bull"],
-  164: ["T20, T18, Bull"],
-  161: ["T20, T17, Bull"],
-  160: ["T20, T20, D20"]
-};
+/* --- State --- */
+const START = 501;
+let players = [
+  {name:'Home (P1)', score:START},
+  {name:'Away (P2)', score:START}
+];
+let legStarter = 0;            // 0 or 1
+let active = 0;                // current scoring player
+let staged = [[],[]];          // staged darts for each player (during turn)
+let history = [];              // confirmed turns: {player,start,darts,turnTotal,bust,legWon}
+let allDarts = [[],[]];        // flattened confirmed darts per player (for averages)
+let totalThrows = [0,0];       // count of darts thrown per player
+let pendingMult = null;        // 'D' or 'T' when selected
+let paused = false;            // modal open pause
 
-const twoDartCheckout = {
-  100: ["T20, D20"],
-  98: ["T20, D19"],
-  96: ["T20, D18"],
-  94: ["T18, D20"],
-  92: ["T20, D16"],
-  90: ["T18, D18"],
-  88: ["T16, D20"],
-  86: ["T18, D16"],
-  84: ["T20, D12"],
-  82: ["T14, D20"],
-  80: ["T20, D10"],
-  78: ["T18, D12"],
-  76: ["T20, D8"],
-  74: ["T14, D16"],
-  72: ["T16, D12"],
-  70: ["T18, D8"],
-  68: ["T20, D4"],
-  66: ["T10, D18"],
-  64: ["T16, D8"],
-  62: ["T10, D16"],
-  60: ["S20, D20"],
-  58: ["S18, D20"],
-  56: ["S16, D20"],
-  54: ["S14, D20"],
-  52: ["S12, D20"],
-  50: ["Bull, D25"]
-};
+/* --- DOM refs --- */
+const startScreen = document.getElementById('startScreen');
+const startBtn = document.getElementById('startBtn');
+const bullWinner = document.getElementById('bullWinner');
+const main = document.getElementById('main');
 
-// ----- Function to display overlay with both checkouts -----
-function showCheckoutOverlay(score) {
-  const overlay = document.getElementById("overlay");
-  let content = "";
+const homeLabel = document.getElementById('homeLabel');
+const awayLabel = document.getElementById('awayLabel');
+const homeScore = document.getElementById('homeScore');
+const awayScore = document.getElementById('awayScore');
+const homeChips = document.getElementById('homeChips');
+const awayChips = document.getElementById('awayChips');
+const homeStats = document.getElementById('homeStats');
+const awayStats = document.getElementById('awayStats');
 
-  // 3-Dart checkout
-  content += `<div class="scorer-section"><h3>3-Dart Checkout Options:</h3>`;
-  if (threeDartCheckout[score]) {
-    content += `<ul>${threeDartCheckout[score].map(c => `<li>${c}</li>`).join('')}</ul>`;
-  } else {
-    content += `<p>None available</p>`;
+const keypad = document.getElementById('keypad');
+const btnD = document.getElementById('btnD');
+const btnT = document.getElementById('btnT');
+
+const undoD = document.getElementById('undoD');
+const undoTurnBtn = document.getElementById('undoTurn');
+const undoLastBtn = document.getElementById('undoLast');
+const submitBtn = document.getElementById('submit');
+
+const statsBtn = document.getElementById('statsBtn');
+const statsModal = document.getElementById('statsModal');
+const statsContent = document.getElementById('statsContent');
+const closeStats = document.getElementById('closeStats');
+
+const winModal = document.getElementById('winModal');
+const winContent = document.getElementById('winContent');
+const nextLegBtn = document.getElementById('nextLeg');
+const newMatchBtn = document.getElementById('newMatch');
+
+const themeToggle = document.getElementById('themeToggle');
+
+/* --- Helpers --- */
+function saveState(){ /* placeholder if future persistence needed */ }
+function updateUI(){
+  // scores
+  homeScore.textContent = players[0].score;
+  awayScore.textContent = players[1].score;
+  // chips
+  for(let p=0;p<2;p++){
+    const chips = (p===0?homeChips:awayChips).querySelectorAll('.dartChip');
+    for(let i=0;i<3;i++){
+      const d = staged[p][i];
+      const chip = chips[i];
+      if(d!==undefined){
+        chip.textContent = d.label || d.val;
+        chip.classList.remove('empty');
+        chip.style.background = d.style || '';
+      } else {
+        chip.textContent = 'D'+(i+1);
+        chip.classList.add('empty');
+        chip.style.background = '';
+      }
+    }
   }
-  content += `</div>`;
-
-  // 2-Dart checkout
-  content += `<div class="scorer-section"><h3>2-Dart Checkout Options:</h3>`;
-  if (twoDartCheckout[score]) {
-    content += `<ul>${twoDartCheckout[score].map(c => `<li>${c}</li>`).join('')}</ul>`;
-  } else {
-    content += `<p>None available</p>`;
-  }
-  content += `</div>`;
-
-  overlay.innerHTML = content;
-  overlay.style.display = 'block';
+  // stats lines (3DA, throws, segments)
+  homeStats.innerHTML = formatStats(0);
+  awayStats.innerHTML = formatStats(1);
+  // active highlight
+  document.getElementById('playerHome').classList.toggle('active', active===0);
+  document.getElementById('playerAway').classList.toggle('active', active===1);
 }
 
-// ----- Button click triggers overlay -----
-document.getElementById("checkoutButton").addEventListener("click", () => {
-  const score = parseInt(document.getElementById("score").value);
-  if (score <= 170) {
-    showCheckoutOverlay(score);
-  } else {
-    document.getElementById("overlay").style.display = 'none';
-    alert("Score above 170: no checkout options available.");
-  }
-});
-</script>
+function formatStats(p){
+  const three = calc3DA(p);
+  const thrown = totalThrows[p];
+  const seg = calcSegments(p);
+  return `3DA: ${three} | Throws: ${thrown}<br>First9: ${seg[9] ?? '-'} | 18: ${seg[18] ?? '-'} | 27: ${seg[27] ?? '-'} | 36+: ${seg['_36plus'] ?? '-'}`;
+}
 
+function calc3DA(p){
+  const darts = allDarts[p];
+  if(!darts.length) return '0.00';
+  const total = darts.reduce((a,b)=>a+b,0);
+  return ((total / darts.length) * 3).toFixed(2);
+}
+
+/* compute segment averages: returns object with keys 9,18,27,36 and _36plus */
+function calcSegments(p){
+  const darts = allDarts[p].slice(); // confirmed darts in chronological order
+  const out = {};
+  function avgOfSlice(len){
+    if(darts.length < len) return null;
+    const slice = darts.slice(0,len);
+    const sum = slice.reduce((a,b)=>a+b,0);
+    // per-3-darts avg = (sum/len)*3
+    return ((sum / slice.length) * 3).toFixed(1);
+  }
+  out[9] = avgOfSlice(9);
+  out[18] = avgOfSlice(18);
+  out[27] = avgOfSlice(27);
+  out[36] = avgOfSlice(36);
+  out['_36plus'] = darts.length >= 36 ? out[36] + '+' : (darts.length > 36 ? ( ( (darts.slice(0,36).reduce((a,b)=>a+b,0)/36)*3 ).toFixed(1) + '+' ) : null);
+  // if exactly 36 or more, show base and plus sign if >36
+  if(darts.length > 36) out['_36plus'] = out[36] + '+';
+  return out;
+}
+
+function pushStaged(p, obj){
+  // obj: {val:number,label:string,style:string,mult:number}
+  if(staged[p].length >= 3) return false;
+  staged[p].push(obj);
+  players[p].score -= obj.val;
+  return true;
+}
+
+/* --- Start game --- */
+startBtn.addEventListener('click', ()=>{
+  const home = document.getElementById('homeName').value.trim() || 'Home';
+  const away = document.getElementById('awayName').value.trim() || 'Away';
+  players[0].name = `${home} (P1)`; players[1].name = `${away} (P2)`;
+  homeLabel.textContent = players[0].name;
+  awayLabel.textContent = players[1].name;
+  // who starts
+  legStarter = bullWinner.value === 'home' ? 0 : 1;
+  active = legStarter;
+  // ensure highlight matches
+  document.getElementById('playerHome').classList.remove('active');
+  document.getElementById('playerAway').classList.remove('active');
+  document.getElementById(active===0?'playerHome':'playerAway').classList.add('active');
+  // show main UI
+  startScreen.style.display = 'none';
+  main.style.display = 'flex';
+  setTimeout(()=> main.style.opacity = 1, 40);
+  updateUI();
+});
+
+/* --- Keypad handler --- */
+keypad.addEventListener('click', (ev)=>{
+  if(paused) return;
+  const btn = ev.target.closest('button');
+  if(!btn) return;
+  const act = btn.dataset.act;
+  const num = btn.dataset.num ? parseInt(btn.dataset.num,10) : null;
+  // multipliers
+  if(act === 'D'){ pendingMult = 'D'; btnD.classList.add('doubleActive'); btnT.classList.remove('active'); return; }
+  if(act === 'T'){ pendingMult = 'T'; btnT.classList.add('active'); btnD.classList.remove('doubleActive'); return; }
+  // value buttons
+  let val = 0;
+  let label = '';
+  if(act === '25'){ val = 25; label = '25'; }
+  else if(act === 'BULL'){ val = 50; label = 'Bull'; }
+  else if(act === 'NS'){ val = 0; label = '0'; }
+  else if(num !== null){ val = num; label = String(num); }
+  // prevent multiplier being applied to 25/Bull
+  if((act === '25' || act === 'BULL') && (pendingMult === 'D' || pendingMult === 'T')) pendingMult = null;
+  // apply multiplier
+  let mult = 1;
+  if(pendingMult === 'D') { val = val * 2; label = 'D' + label; mult = 2; }
+  if(pendingMult === 'T') { val = val * 3; label = 'T' + label; mult = 3; }
+  // clear multiplier UI
+  pendingMult = null; btnD.classList.remove('doubleActive'); btnT.classList.remove('active');
+  // push staged
+  if(staged[active].length >= 3) { flash('Max 3 darts'); return; }
+  const style = (mult===3)?'linear-gradient(90deg,#ffdede,#ff9e9e)':(mult===2?'linear-gradient(90deg,#fff8cc,#fff0b0)':'');
+  staged[active].push({val,label,style,mult});
+  players[active].score -= val; // already done in pushStaged in earlier versions; do here
+  updateUI();
+});
+
+/* flash helper */
+function flash(text){
+  const el = document.getElementById('message') || document.createElement('div');
+  el.id = 'message'; el.style.position='fixed'; el.style.left='50%'; el.style.transform='translateX(-50%)';
+  el.style.bottom='18vh'; el.style.background='rgba(0,0,0,0.7)'; el.style.color='#fff'; el.style.padding='8px 12px';
+  el.style.borderRadius='8px'; el.style.zIndex = 999; el.textContent = text;
+  document.body.appendChild(el);
+  el.style.opacity = 1;
+  setTimeout(()=>{ el.style.opacity = 0; setTimeout(()=>el.remove(),500); },1200);
+}
+
+/* --- undo staged dart --- */
+undoD.addEventListener('click', ()=>{
+  if(staged[active].length === 0) { flash('No staged darts'); return; }
+  const removed = staged[active].pop();
+  players[active].score += removed.val;
+  updateUI();
+});
+
+/* --- undo staged turn (clear staged) --- */
+undoTurnBtn.addEventListener('click', ()=>{
+  if(staged[active].length === 0) { flash('Nothing to undo'); return; }
+  // revert scores from staged
+  staged[active].forEach(d => players[active].score += d.val);
+  staged[active] = [];
+  updateUI();
+});
+
+/* --- undo last confirmed turn --- */
+undoLastBtn.addEventListener('click', ()=>{
+  if(history.length === 0){ flash('No confirmed turns'); return; }
+  // find last confirmed (pop)
+  let last = null;
+  for(let i = history.length-1; i>=0; i--){
+    if(!history[i].undo){ last = history.splice(i,1)[0]; break; }
+  }
+  if(!last){ flash('No confirmed turns'); return; }
+  // revert
+  const p = last.player;
+  players[p].score = last.startScore;
+  // remove darts from allDarts and decrement throws
+  const count = last.darts.length;
+  allDarts[p].splice(-count);
+  totalThrows[p] = Math.max(0, totalThrows[p]-count);
+  updateUI();
+  flash('Last confirmed turn undone');
+});
+
+/* --- submit staged turn --- */
+submitBtn.addEventListener('click', ()=>{
+  if(paused) return;
+  if(staged[active].length === 0){ flash('Enter at least one dart'); return; }
+  const start = players[active].score + staged[active].reduce((a,b)=>a+b.val,0);
+  const turnTotal = staged[active].reduce((a,b)=>a+b.val,0);
+  const newScore = start - turnTotal;
+  // update totalThrows
+  totalThrows[active] += staged[active].length;
+  // bust rules
+  let bust = false;
+  let finished = false;
+  if(newScore < 0) bust = true;
+  else if(newScore === 1) bust = true;
+  else if(newScore === 0){
+    // check last dart double if mandate double out
+    const last = staged[active][staged[active].length - 1];
+    const isDoubleBull = last && (last.label === 'Bull');
+    const isDouble = last && (last.mult === 2);
+    // assume double out rule true (as earlier)
+    if(isDouble || isDoubleBull) finished = true; else bust = true;
+  }
+
+  if(bust){
+    // record bust (no score change)
+    history.push({player:active,startScore:start,darts:staged[active].slice(),turnTotal:0,bust:true,legWon:false});
+    // restore start
+    players[active].score = start;
+    staged[active] = [];
+    updateUI();
+    flash('BUST!');
+    switchPlayer();
+    return;
+  }
+
+  if(finished){
+    // record finishing turn
+    history.push({player:active,startScore:start,darts:staged[active].slice(),turnTotal, bust:false, legWon:true});
+    // add darts to allDarts
+    staged[active].forEach(d => allDarts[active].push(d.val));
+    // update stats
+    updateUI();
+    // show win overlay with both players' stats
+    showWinOverlay(active);
+    return;
+  }
+
+  // normal apply: commit
+  history.push({player:active,startScore:start,darts:staged[active].slice(),turnTotal,bust:false,legWon:false});
+  staged[active].forEach(d => allDarts[active].push(d.val));
+  players[active].score = newScore;
+  staged[active] = [];
+  updateUI();
+  switchPlayer();
+});
+
+/* --- show win overlay --- */
+function showWinOverlay(winner){
+  paused = true;
+  const loser = 1 - winner;
+  const winnerName = players[winner].name;
+  const loserName = players[loser].name;
+  const w3 = calc3DA(winner), l3 = calc3DA(loser);
+  const wThrows = totalThrows[winner], lThrows = totalThrows[loser];
+  winContent.innerHTML = `
+    <p><strong>${winnerName}</strong> - 3DA: ${w3} | Throws: ${wThrows}</p>
+    <p><strong>${loserName}</strong> - 3DA: ${l3} | Throws: ${lThrows}</p>
+  `;
+  document.getElementById('winModal').style.display = 'flex';
+}
+
+/* --- next leg / new match --- */
+nextLegBtn.addEventListener('click', ()=>{
+  // alternate starter
+  legStarter = 1 - legStarter;
+  active = legStarter;
+  // reset players scores and staged but keep history? we'll clear history for new leg
+  players[0].score = START; players[1].score = START;
+  staged = [[],[]]; history = []; allDarts = [[],[]]; totalThrows = [0,0];
+  document.getElementById('winModal').style.display = 'none';
+  paused = false;
+  updateUI();
+  // ensure highlight
+  document.getElementById('playerHome').classList.remove('active');
+  document.getElementById('playerAway').classList.remove('active');
+  document.getElementById(active===0?'playerHome':'playerAway').classList.add('active');
+});
+
+newMatchBtn.addEventListener('click', ()=> location.reload());
+
+/* --- Stats modal --- */
+statsBtn.addEventListener('click', ()=>{
+  paused = true;
+  // build statsContent with both players
+  const lines = [0,1].map(p=>{
+    return `<strong>${players[p].name}</strong><br>
+      Remaining: ${players[p].score}<br>
+      3DA: ${calc3DA(p)}<br>
+      Throws: ${totalThrows[p]}<br>
+      First9: ${calcSegments(p)[9] ?? '-'} | 18: ${calcSegments(p)[18] ?? '-'} | 27: ${calcSegments(p)[27] ?? '-'} | 36+: ${calcSegments(p)['_36plus'] ?? '-'}
+    `;
+  }).join('<hr/>');
+  statsContent.innerHTML = lines;
+  statsModal.style.display = 'flex';
+});
+closeStats.addEventListener('click', ()=>{ statsModal.style.display = 'none'; paused = false; });
+
+/* theme toggle */
+themeToggle.addEventListener('click', ()=>{
+  if(document.body.classList.contains('light')){ document.body.classList.remove('light'); document.body.classList.add('dark'); themeToggle.textContent = '🌤️ Light'; }
+  else { document.body.classList.remove('dark'); document.body.classList.add('light'); themeToggle.textContent = '🌙 Dark'; }
+});
+
+/* init */
+document.body.classList.add('light');
+updateUI();
+</script>
 </body>
 </html>
