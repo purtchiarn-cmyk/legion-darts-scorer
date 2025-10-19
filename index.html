@@ -1,88 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legion Darts Scorer</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legion Darts Scorer v2.3.1</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- START SCREEN -->
-  <div id="start-screen" class="container">
+  <!-- Start Screen -->
+  <div id="start-screen" class="screen active">
     <h1>🎯 Legion Darts Scorer</h1>
-    <div class="input-group">
-      <label>Home Player:</label>
-      <input id="homeName" type="text" placeholder="Enter Home Name" value="Home (P1)">
-    </div>
-    <div class="input-group">
-      <label>Away Player:</label>
-      <input id="awayName" type="text" placeholder="Enter Away Name" value="Away (P2)">
-    </div>
-    <div class="input-group">
-      <label>Who won the bull?</label>
-      <select id="bullWinner">
-        <option value="0">Home (P1)</option>
-        <option value="1">Away (P2)</option>
-      </select>
-    </div>
-    <button id="startButton">Start Match</button>
+    <label>Home Name:</label>
+    <input id="homeName" type="text" placeholder="Home (P1)" />
+    <label>Away Name:</label>
+    <input id="awayName" type="text" placeholder="Away (P2)" />
+    <label>Who won bull?</label>
+    <select id="bullWinner">
+      <option value="0">Home</option>
+      <option value="1">Away</option>
+    </select>
+    <button id="startBtn" onclick="startMatch()">Start Match</button>
   </div>
 
-  <!-- GAME SCREEN -->
-  <div id="game-screen" class="container" style="display:none;">
-
-    <!-- SCOREBOARD -->
-    <div class="scoreboard">
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen hidden">
+    <header>
       <div class="player" id="player0">
-        <div class="player-name">Home (P1)</div>
+        <div class="player-name">Home</div>
         <div class="player-score">501</div>
-        <div class="player-3da">3DA: 0.0</div>
+        <div class="player-avg">3DA: 0.00</div>
       </div>
       <div class="player" id="player1">
-        <div class="player-name">Away (P2)</div>
+        <div class="player-name">Away</div>
         <div class="player-score">501</div>
-        <div class="player-3da">3DA: 0.0</div>
+        <div class="player-avg">3DA: 0.00</div>
       </div>
-    </div>
+    </header>
 
-    <!-- ICONS -->
-    <div class="icon-row top-icons">
-      <button class="icon-button coin-icon" title="Coin feature (future)">🪙</button>
-      <button class="icon-button checkout-icon" onclick="toggleCheckout()" title="Checkout routes">🛒</button>
-      <button class="icon-button stats-icon" onclick="showStats()" title="Match stats">📊</button>
-    </div>
+    <main>
+      <div id="dart-display">
+        <div class="dart-slot" id="dart1">–</div>
+        <div class="dart-slot" id="dart2">–</div>
+        <div class="dart-slot" id="dart3">–</div>
+      </div>
 
-    <!-- KEYPAD -->
-    <div class="keypad">
-      <button id="D" class="multi-btn" onclick="pressMultiplier('D')">D</button>
-      <button id="T" class="multi-btn" onclick="pressMultiplier('T')">T</button>
-      <button onclick="pressNumber(25)">25</button>
-      <button onclick="pressNumber(50)">Bull</button>
-      <button onclick="pressNumber(0)">No</button>
-      <script>
-        for (let i = 1; i <= 20; i++) {
-          document.write(`<button class="number-btn" onclick="pressNumber(${i})">${i}</button>`);
-        }
-      </script>
-    </div>
+      <div id="modifiers">
+        <button id="doubleBtn" onclick="setModifier('D')">D</button>
+        <button id="tripleBtn" onclick="setModifier('T')">T</button>
+        <button id="score25" onclick="addScore(25)">25</button>
+        <button id="scoreBull" onclick="addScore(50)">Bull</button>
+        <button id="noScore" onclick="addScore(0)">No Score</button>
+      </div>
 
-    <!-- ACTIONS -->
-    <div class="action-row">
-      <button onclick="undoLastDart()">↩️ Undo Dart</button>
-      <button onclick="nextPlayer()">⏭️ Next Player</button>
-    </div>
+      <div id="numpad" class="grid"></div>
 
+      <div id="actions">
+        <button id="statsBtn" onclick="toggleStats()">📊</button>
+        <button id="checkoutBtn" onclick="toggleCheckout()">🛒</button>
+        <button id="coinBtn" class="coin">🪙</button>
+        <button id="undoDart" onclick="undoDart()">↩️ Last Dart</button>
+        <button id="undoTurn" onclick="undoTurn()">↩️ Turn</button>
+        <button id="submitBtn" onclick="submitTurn()">✅ Submit</button>
+      </div>
+    </main>
   </div>
 
-  <!-- CHECKOUT MODAL -->
-  <div id="checkoutModal" class="modal">
+  <!-- Stats Modal -->
+  <div id="statsModal" class="modal hidden">
     <div class="modal-content">
-      <div id="checkoutContent"></div>
+      <h2>📊 Match Stats</h2>
+      <div id="statsContent"></div>
+      <button onclick="toggleStats()">Close</button>
     </div>
   </div>
 
-  <div id="tooltip" class="tooltip"></div>
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🎯 Checkout Guide</h2>
+      <div id="checkoutContent"></div>
+      <button onclick="toggleCheckout()">Close</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
