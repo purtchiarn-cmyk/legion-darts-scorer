@@ -1,148 +1,202 @@
+/* ===== LEGION DARTS SCORER v2.3.1 STYLE ===== */
+
+:root {
+  --primary: #0d47a1;
+  --accent: #1976d2;
+  --bg: #f4f7fb;
+  --text: #222;
+  --white: #fff;
+  --highlight: #2196f3;
+  --error: #c62828;
+}
+
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Poppins", sans-serif;
   margin: 0;
-  padding: 0;
-  background: radial-gradient(circle at top, #14213d, #000);
-  color: #fff;
-  text-align: center;
-  user-select: none;
-}
-
-.container {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* --- Start Screen --- */
-#start-screen input, #start-screen select {
-  width: 80%;
-  padding: 8px;
-  margin: 5px;
-  border: none;
-  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
   text-align: center;
 }
 
-#start-screen button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  font-size: 1.1em;
-  border: none;
+/* ===== SCREENS ===== */
+.screen {
+  width: 100%;
+  max-width: 450px;
+  padding: 1rem;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+}
+.screen.active {
+  display: flex;
+}
+.screen.hidden {
+  display: none;
+}
+
+/* ===== START SCREEN ===== */
+#start-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+#start-screen input,
+#start-screen select {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  background: #0077ff;
-  color: #fff;
+  width: 80%;
+  font-size: 1rem;
+}
+#startBtn {
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+#startBtn:hover {
+  background: var(--highlight);
 }
 
-/* --- Scoreboard --- */
-.scoreboard {
+/* ===== HEADER / SCOREBOARD ===== */
+header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  width: 100%;
+  margin: 0.8rem 0;
 }
-
 .player {
   flex: 1;
-  background: rgba(255,255,255,0.1);
-  margin: 5px;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,255,255,0.3);
+  margin: 0.3rem;
+  background: var(--white);
+  border-radius: 10px;
+  padding: 0.6rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
 .player.active {
-  border: 2px solid #00ffaa;
-  box-shadow: 0 0 15px rgba(0,255,170,0.6);
+  border: 2px solid var(--highlight);
+  box-shadow: 0 0 10px var(--highlight);
+  transition: all 0.3s ease;
 }
-
+.player-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
 .player-score {
-  font-size: 2em;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+.player-avg {
+  font-size: 0.9rem;
+  color: #444;
 }
 
-.player-3da {
-  font-size: 0.9em;
-  color: #0ff;
-}
-
-/* --- Icons --- */
-.icon-row {
+/* ===== DART DISPLAY ===== */
+#dart-display {
   display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.dart-slot {
+  background: #e8eaf6;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  font-size: 1.2rem;
+  min-width: 2.5rem;
+  transition: background 0.2s ease;
 }
 
-.icon-button {
-  background: none;
-  border: none;
-  font-size: 1.6em;
-  color: #0ff;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.icon-button:hover {
-  transform: scale(1.1);
-  color: #fff;
-}
-
-/* --- Keypad --- */
-.keypad {
+/* ===== BUTTON SECTIONS ===== */
+#modifiers, #actions {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-top: 15px;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
 }
 
 button {
-  background: #1e1e2e;
+  padding: 0.8rem;
   border: none;
-  color: white;
-  font-size: 1.3em;
-  border-radius: 6px;
-  padding: 14px;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+button:hover {
+  background: var(--highlight);
+  transform: scale(1.05);
 }
 
-button:active {
-  transform: scale(0.95);
+/* ===== NUMPAD ===== */
+#numpad {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+#numpad button {
+  height: 4rem;
+  font-size: 1.3rem;
 }
 
-button.glow {
-  background: #00ffff;
-  color: #111;
-  box-shadow: 0 0 15px #0ff;
-}
-
-/* --- Modal --- */
+/* ===== MODALS ===== */
 .modal {
-  display: none;
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.4);
+  display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10;
 }
-
+.modal.hidden {
+  display: none;
+}
 .modal-content {
-  background: #1a2030;
-  color: white;
-  padding: 20px;
+  background: var(--white);
+  padding: 1rem;
   border-radius: 10px;
-  width: 80%;
-  max-width: 350px;
-  box-shadow: 0 0 20px rgba(0,255,255,0.5);
+  width: 85%;
+  max-width: 400px;
   text-align: center;
 }
 
-/* --- Tooltip --- */
-.tooltip {
-  position: absolute;
-  background: #333;
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 0.8em;
-  display: none;
+/* ===== COIN ANIMATION ===== */
+.coin {
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ===== GLOW FEEDBACK ===== */
+@keyframes glow {
+  0% { box-shadow: 0 0 0px var(--highlight); }
+  50% { box-shadow: 0 0 15px var(--highlight); }
+  100% { box-shadow: 0 0 0px var(--highlight); }
+}
+.player.glow {
+  animation: glow 0.5s ease;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .player-score { font-size: 1.5rem; }
+  button { font-size: 1rem; padding: 0.6rem; }
+  #numpad button { height: 3.5rem; }
 }
