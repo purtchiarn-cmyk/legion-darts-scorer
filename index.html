@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Darts Scorer Overlay</title>
+<title>Darts Checkout Scorer</title>
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; }
   input { width: 60px; }
@@ -19,26 +19,33 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     z-index: 1000;
   }
-  #overlay h2 { margin-top: 0; }
+  #overlay h3 { margin-top: 0; }
   .scorer-section { margin-bottom: 15px; }
 </style>
 </head>
 <body>
 
 <h1>Darts Checkout Scorer</h1>
-<label>Current Score: <input type="number" id="score" value="180"></label>
-<button onclick="calculateScore()">Check Checkout</button>
+<p>Current Score: <input type="number" id="score" value="180"></p>
+<button id="checkoutButton">Check Checkout</button>
 
+<!-- Original scorer text area -->
+<div id="scorerText">
+  <!-- This can hold your existing scorer output -->
+  <p>Your current scorer text will appear here.</p>
+</div>
+
+<!-- Overlay for checkout options -->
 <div id="overlay"></div>
 
 <script>
-// Simplified static checkout options
+// ----- Example static 3-dart and 2-dart checkout combos -----
 const threeDartCheckout = {
   170: ["T20, T20, Bull"],
   167: ["T20, T19, Bull"],
   164: ["T20, T18, Bull"],
   161: ["T20, T17, Bull"],
-  160: ["T20, T20, D20"],
+  160: ["T20, T20, D20"]
 };
 
 const twoDartCheckout = {
@@ -67,40 +74,46 @@ const twoDartCheckout = {
   56: ["S16, D20"],
   54: ["S14, D20"],
   52: ["S12, D20"],
-  50: ["Bull, D25"],
+  50: ["Bull, D25"]
 };
 
-function calculateScore() {
-  const score = parseInt(document.getElementById("score").value);
+// ----- Function to display overlay with both checkouts -----
+function showCheckoutOverlay(score) {
   const overlay = document.getElementById("overlay");
   let content = "";
 
-  if (score <= 170) {
-    // 3-dart scorer
-    if (threeDartCheckout[score]) {
-      content += `<div class="scorer-section"><h3>3-Dart Checkout Options:</h3><ul>` +
-        threeDartCheckout[score].map(c => `<li>${c}</li>`).join('') +
-        `</ul></div>`;
-    } else {
-      content += `<div class="scorer-section"><h3>3-Dart Checkout Options:</h3><p>None available</p></div>`;
-    }
-
-    // 2-dart scorer
-    if (twoDartCheckout[score]) {
-      content += `<div class="scorer-section"><h3>2-Dart Checkout Options:</h3><ul>` +
-        twoDartCheckout[score].map(c => `<li>${c}</li>`).join('') +
-        `</ul></div>`;
-    } else {
-      content += `<div class="scorer-section"><h3>2-Dart Checkout Options:</h3><p>None available</p></div>`;
-    }
-
-    overlay.innerHTML = content;
-    overlay.style.display = 'block';
+  // 3-Dart checkout
+  content += `<div class="scorer-section"><h3>3-Dart Checkout Options:</h3>`;
+  if (threeDartCheckout[score]) {
+    content += `<ul>${threeDartCheckout[score].map(c => `<li>${c}</li>`).join('')}</ul>`;
   } else {
-    overlay.style.display = 'none';
+    content += `<p>None available</p>`;
+  }
+  content += `</div>`;
+
+  // 2-Dart checkout
+  content += `<div class="scorer-section"><h3>2-Dart Checkout Options:</h3>`;
+  if (twoDartCheckout[score]) {
+    content += `<ul>${twoDartCheckout[score].map(c => `<li>${c}</li>`).join('')}</ul>`;
+  } else {
+    content += `<p>None available</p>`;
+  }
+  content += `</div>`;
+
+  overlay.innerHTML = content;
+  overlay.style.display = 'block';
+}
+
+// ----- Button click triggers overlay -----
+document.getElementById("checkoutButton").addEventListener("click", () => {
+  const score = parseInt(document.getElementById("score").value);
+  if (score <= 170) {
+    showCheckoutOverlay(score);
+  } else {
+    document.getElementById("overlay").style.display = 'none';
     alert("Score above 170: no checkout options available.");
   }
-}
+});
 </script>
 
 </body>
