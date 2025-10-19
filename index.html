@@ -6,34 +6,30 @@
   <title>Legion Darts Scorer</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body onload="initGame()">
+<body>
 
   <!-- START SCREEN -->
   <div id="start-screen" class="container">
     <h1>🎯 Legion Darts Scorer</h1>
-
     <div class="input-group">
-      <label for="homeName">Home Player</label>
-      <input type="text" id="homeName" placeholder="Enter Home Name" value="Home (P1)">
+      <label>Home Player:</label>
+      <input id="homeName" type="text" placeholder="Enter Home Name" value="Home (P1)">
     </div>
-
     <div class="input-group">
-      <label for="awayName">Away Player</label>
-      <input type="text" id="awayName" placeholder="Enter Away Name" value="Away (P2)">
+      <label>Away Player:</label>
+      <input id="awayName" type="text" placeholder="Enter Away Name" value="Away (P2)">
     </div>
-
     <div class="input-group">
-      <label for="bullWinner">Who won bull?</label>
+      <label>Who won the bull?</label>
       <select id="bullWinner">
         <option value="0">Home (P1)</option>
         <option value="1">Away (P2)</option>
       </select>
     </div>
-
-    <button onclick="startMatch()">Start Match</button>
+    <button id="startButton">Start Match</button>
   </div>
 
-  <!-- MAIN GAME SCREEN -->
+  <!-- GAME SCREEN -->
   <div id="game-screen" class="container" style="display:none;">
 
     <!-- SCOREBOARD -->
@@ -50,11 +46,11 @@
       </div>
     </div>
 
-    <!-- ICON ROW -->
-    <div class="icon-row">
-      <button class="icon-button coin-icon">🪙</button>
-      <button class="icon-button checkout-icon" onclick="toggleCheckout()">🛒</button>
-      <button class="icon-button stats-icon" onclick="showStats()">📊</button>
+    <!-- ICONS -->
+    <div class="icon-row top-icons">
+      <button class="icon-button coin-icon" title="Coin feature (future)">🪙</button>
+      <button class="icon-button checkout-icon" onclick="toggleCheckout()" title="Checkout routes">🛒</button>
+      <button class="icon-button stats-icon" onclick="showStats()" title="Match stats">📊</button>
     </div>
 
     <!-- KEYPAD -->
@@ -64,8 +60,6 @@
       <button onclick="pressNumber(25)">25</button>
       <button onclick="pressNumber(50)">Bull</button>
       <button onclick="pressNumber(0)">No</button>
-
-      <!-- Dart numbers 1–20 -->
       <script>
         for (let i = 1; i <= 20; i++) {
           document.write(`<button class="number-btn" onclick="pressNumber(${i})">${i}</button>`);
@@ -73,50 +67,23 @@
       </script>
     </div>
 
-    <!-- ACTION ROW -->
-    <div class="icon-row">
+    <!-- ACTIONS -->
+    <div class="action-row">
       <button onclick="undoLastDart()">↩️ Undo Dart</button>
       <button onclick="nextPlayer()">⏭️ Next Player</button>
     </div>
 
   </div>
 
-  <!-- MODAL -->
+  <!-- CHECKOUT MODAL -->
   <div id="checkoutModal" class="modal">
     <div class="modal-content">
       <div id="checkoutContent"></div>
     </div>
   </div>
 
-  <!-- TOOLTIP -->
   <div id="tooltip" class="tooltip"></div>
 
   <script src="script.js"></script>
-
-  <script>
-    // ---- START MATCH LOGIC ----
-    function startMatch() {
-      const homeName = document.getElementById('homeName').value || "Home (P1)";
-      const awayName = document.getElementById('awayName').value || "Away (P2)";
-      const bullWinner = parseInt(document.getElementById('bullWinner').value);
-
-      players[0].name = homeName;
-      players[1].name = awayName;
-
-      activePlayer = bullWinner;
-
-      document.getElementById("player0").querySelector(".player-name").innerText = homeName;
-      document.getElementById("player1").querySelector(".player-name").innerText = awayName;
-
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('game-screen').style.display = 'block';
-
-      updateUI();
-    }
-
-    function showStats() {
-      alert("📊 Stats feature coming soon!");
-    }
-  </script>
 </body>
 </html>
