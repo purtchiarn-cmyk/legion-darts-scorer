@@ -3,84 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legion Darts Scorer v2.3.1</title>
+  <title>Legion Darts Scorer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Start Screen -->
-  <div id="start-screen" class="screen active">
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="active">
     <h1>🎯 Legion Darts Scorer</h1>
-    <label>Home Name:</label>
-    <input id="homeName" type="text" placeholder="Home (P1)" />
-    <label>Away Name:</label>
-    <input id="awayName" type="text" placeholder="Away (P2)" />
-    <label>Who won bull?</label>
-    <select id="bullWinner">
-      <option value="0">Home</option>
-      <option value="1">Away</option>
-    </select>
-    <button id="startBtn" onclick="startMatch()">Start Match</button>
+
+    <div class="input-section">
+      <label>Home Player:</label>
+      <input id="homeName" type="text" placeholder="Home Player" />
+
+      <label>Away Player:</label>
+      <input id="awayName" type="text" placeholder="Away Player" />
+
+      <label>Who won bull?</label>
+      <select id="bullWinner">
+        <option value="0">Home</option>
+        <option value="1">Away</option>
+      </select>
+    </div>
+
+    <button id="startBtn" onclick="startMatch()">Start Game</button>
+    <p class="version">v2.3.1</p>
   </div>
 
-  <!-- Game Screen -->
-  <div id="game-screen" class="screen hidden">
-    <header>
-      <div class="player" id="player0">
-        <div class="player-name">Home</div>
-        <div class="player-score">501</div>
-        <div class="player-avg">3DA: 0.00</div>
+  <!-- MAIN GAME SCREEN -->
+  <div id="game-screen" class="hidden">
+    <header class="scoreboard">
+      <div id="homeScore" class="player-score active">
+        <h2 id="homeLabel">Home (P1)</h2>
+        <p class="score">501</p>
+        <p class="three-da">3DA: 0.00</p>
       </div>
-      <div class="player" id="player1">
-        <div class="player-name">Away</div>
-        <div class="player-score">501</div>
-        <div class="player-avg">3DA: 0.00</div>
+      <div id="awayScore" class="player-score">
+        <h2 id="awayLabel">Away (P2)</h2>
+        <p class="score">501</p>
+        <p class="three-da">3DA: 0.00</p>
       </div>
     </header>
 
-    <main>
-      <div id="dart-display">
-        <div class="dart-slot" id="dart1">–</div>
-        <div class="dart-slot" id="dart2">–</div>
-        <div class="dart-slot" id="dart3">–</div>
-      </div>
-
-      <div id="modifiers">
-        <button id="doubleBtn" onclick="setModifier('D')">D</button>
-        <button id="tripleBtn" onclick="setModifier('T')">T</button>
-        <button id="score25" onclick="addScore(25)">25</button>
-        <button id="scoreBull" onclick="addScore(50)">Bull</button>
-        <button id="noScore" onclick="addScore(0)">No Score</button>
-      </div>
-
-      <div id="numpad" class="grid"></div>
-
-      <div id="actions">
-        <button id="statsBtn" onclick="toggleStats()">📊</button>
-        <button id="checkoutBtn" onclick="toggleCheckout()">🛒</button>
-        <button id="coinBtn" class="coin">🪙</button>
-        <button id="undoDart" onclick="undoDart()">↩️ Last Dart</button>
-        <button id="undoTurn" onclick="undoTurn()">↩️ Turn</button>
-        <button id="submitBtn" onclick="submitTurn()">✅ Submit</button>
-      </div>
-    </main>
-  </div>
-
-  <!-- Stats Modal -->
-  <div id="statsModal" class="modal hidden">
-    <div class="modal-content">
-      <h2>📊 Match Stats</h2>
-      <div id="statsContent"></div>
-      <button onclick="toggleStats()">Close</button>
+    <!-- DARTS ROW -->
+    <div id="darts-row">
+      <button id="dart1" class="dart">–</button>
+      <button id="dart2" class="dart">–</button>
+      <button id="dart3" class="dart">–</button>
     </div>
-  </div>
 
-  <!-- Checkout Modal -->
-  <div id="checkoutModal" class="modal hidden">
-    <div class="modal-content">
-      <h2>🎯 Checkout Guide</h2>
-      <div id="checkoutContent"></div>
-      <button onclick="toggleCheckout()">Close</button>
+    <!-- MULTIPLIER + NUMPAD -->
+    <div id="controls">
+      <div id="multiplier-column">
+        <button id="doubleBtn" class="mult-btn">D</button>
+        <button id="trebleBtn" class="mult-btn">T</button>
+        <button id="btn25">25</button>
+        <button id="btnBull">Bull</button>
+        <button id="noScoreBtn">No Score</button>
+      </div>
+
+      <div id="numpad">
+        <!-- 5 columns of numbers -->
+        <div class="numpad-grid">
+          <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
+          <button>6</button><button>7</button><button>8</button><button>9</button><button>10</button>
+          <button>11</button><button>12</button><button>13</button><button>14</button><button>15</button>
+          <button>16</button><button>17</button><button>18</button><button>19</button><button>20</button>
+          <button id="coinBtn">🪙</button>
+          <button id="statsBtn">📊</button>
+          <button id="checkoutBtn">🛒</button>
+          <button id="undoDartBtn">↩️</button>
+          <button id="submitBtn">✔️</button>
+        </div>
+      </div>
     </div>
+
+    <!-- STATS MODAL -->
+    <div id="statsModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Leg Stats</h3>
+        <p id="statsSummary">Loading...</p>
+        <button onclick="closeStats()">Close</button>
+      </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkoutModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Checkout Options</h3>
+        <p id="checkoutDisplay">No checkout available</p>
+        <button onclick="closeCheckout()">Close</button>
+      </div>
+    </div>
+
+    <!-- WINNER MODAL -->
+    <div id="winnerModal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="winnerMessage">🎯 Congratulations, Sharp Shooter!</h3>
+        <button onclick="nextLeg()">Next Leg</button>
+        <button onclick="newMatch()">New Match</button>
+      </div>
+    </div>
+
   </div>
 
   <script src="script.js"></script>
